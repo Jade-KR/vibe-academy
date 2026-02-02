@@ -1,8 +1,16 @@
+import { getTranslations } from "next-intl/server";
+import { LandingContent } from "@/widgets/landing";
+
+export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }) {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: "landing" });
+
+  return {
+    title: t("meta.title"),
+    description: t("meta.description"),
+  };
+}
+
 export default function HomePage() {
-  return (
-    <main className="flex min-h-screen flex-col items-center justify-center">
-      <h1 className="text-4xl font-bold">vibePack</h1>
-      <p className="mt-4 text-lg text-gray-600">SaaS Boilerplate</p>
-    </main>
-  );
+  return <LandingContent />;
 }

@@ -1,5 +1,6 @@
+export { LandingContent } from "./ui/landing-content";
 export { HeroSection } from "./ui/hero-section";
-export { FeaturesSection } from "./ui/features-section";
-export { HowItWorksSection } from "./ui/how-it-works-section";
-export { TestimonialsSection } from "./ui/testimonials-section";
-export { CtaSection } from "./ui/cta-section";
+export { FeaturedCoursesCarousel } from "./ui/featured-courses-carousel";
+export { ValuePropositionSection } from "./ui/value-proposition-section";
+export { CategoryCoursesSection } from "./ui/category-courses-section";
+export { ReviewHighlightsSection } from "./ui/review-highlights-section";
