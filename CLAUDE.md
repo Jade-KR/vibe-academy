@@ -19,7 +19,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - **i18n**: next-intl (ko default, en), URL-based locale prefix (`/ko/...`, `/en/...`)
 - **Theme**: next-themes (light/dark/system)
 - **Testing**: Vitest + React Testing Library, Playwright
-- **Monitoring**: Sentry
+- **Monitoring**: Sentry (planned, not yet installed)
 - **Deploy**: Vercel (region: icn1)
 
 ## Commands
@@ -34,10 +34,13 @@ pnpm typecheck          # tsc --noEmit
 pnpm test               # Vitest unit tests
 pnpm test -- src/__tests__/widgets/landing/  # Run tests for specific directory
 pnpm test -- --testNamePattern "renders hero" # Run tests matching name pattern
+pnpm test:ui            # Vitest browser UI
 pnpm test:coverage      # Vitest with coverage
 pnpm test:e2e           # Playwright E2E
+pnpm test:e2e:ui        # Playwright browser UI
 pnpm db:generate        # Drizzle generate migrations
 pnpm db:push            # Drizzle push schema
+pnpm db:studio          # Drizzle Studio (DB browser)
 pnpm db:seed            # Seed database
 pnpm setup              # Full setup (env validation, migrations, seed, build)
 pnpm email:dev          # Preview email templates
@@ -87,7 +90,7 @@ slice-name/
 - `src/shared/api/resend/` — Email client and React templates
 - `src/shared/config/` — site.ts, auth.ts, navigation.ts
 - `src/shared/lib/` — cn() utility, format helpers, Zod validation schemas
-- `src/shared/providers/` — SWR, theme, auth, intl providers (composed in root layout)
+- `src/shared/providers/` — Individual provider components (SWR, theme, auth); composed in `src/app/providers.tsx`
 - `src/shared/types/` — Shared TypeScript type definitions
 
 ### Route Groups
@@ -127,7 +130,9 @@ Three tables in `src/db/schema/`: `users` (profile + supabase_user_id), `subscri
 
 ### Testing
 
-- Test location: `src/__tests__/` mirroring source structure
+- Unit tests: `src/__tests__/` mirroring source structure (Vitest + jsdom + React Testing Library)
+- E2E tests: `e2e/` directory (Playwright, Chromium only)
+- Setup file: `src/__tests__/setup.ts` includes ResizeObserver polyfill for Radix UI components
 - Mock pattern for i18n in tests:
   ```typescript
   vi.mock("next-intl", () => ({
@@ -138,13 +143,24 @@ Three tables in `src/db/schema/`: `users` (profile + supabase_user_id), `subscri
   }));
   ```
 
+### Code Style
+
+- **Prettier**: double quotes, semicolons, trailing commas, 2-space indent, 100 char print width
+- **ESLint**: `next/core-web-vitals` + `@typescript-eslint/recommended` + `prettier`; unused vars must be `_` prefixed; `no-explicit-any` is warn-level
+- **Provider nesting order** in `src/app/providers.tsx`: IntlProvider → ThemeProvider → AuthProvider → SWRProvider
+
 ## Solo Workflow
 
-This project uses the solo workflow plugin. Task list at `.solo/tasks.json`. Skills in `.claude/skills/`:
+This project uses the solo workflow plugin. Skills in `.claude/skills/`:
 
 - `vercel-react-best-practices` — React/Next.js performance patterns
 - `supabase-postgres-best-practices` — Postgres optimization
 - `web-design-guidelines` — UI/UX review
+
+## Reference Docs
+
+- `docs/PROJECT-OVERVIEW.md` — Comprehensive Korean-language architecture document covering auth flows, payment system, middleware chain, provider composition, API response format, and all widget/entity details
+- `docs/PRD-lecture-platform.md` — PRD for the lecture platform (next phase, builds on vibePack boilerplate)
 
 ## 꼭 지켜야할것
 

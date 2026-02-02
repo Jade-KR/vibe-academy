@@ -5,3 +5,5 @@ export { MagicLinkEmail } from "./templates/magic-link";
 export { OtpEmail } from "./templates/otp";
 export { ResetPasswordEmail } from "./templates/reset-password";
 export { SubscriptionEmail } from "./templates/subscription";
+export { CourseEnrollmentEmail } from "./templates/course-enrollment";
+export { RefundEmail } from "./templates/refund";

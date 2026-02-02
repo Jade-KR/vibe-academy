@@ -1,5 +1,6 @@
 import { pgTable, uuid, varchar, text, timestamp } from "drizzle-orm/pg-core";
 import type { InferSelectModel, InferInsertModel } from "drizzle-orm";
+import { userRoleEnum } from "./enums";
 
 export const users = pgTable("users", {
   id: uuid("id").primaryKey().defaultRandom(),
@@ -7,6 +8,7 @@ export const users = pgTable("users", {
   email: varchar("email", { length: 255 }).notNull().unique(),
   name: varchar("name", { length: 100 }),
   avatarUrl: text("avatar_url"),
+  role: userRoleEnum("role").default("user").notNull(),
   locale: varchar("locale", { length: 10 }).default("ko"),
   createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
   updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),

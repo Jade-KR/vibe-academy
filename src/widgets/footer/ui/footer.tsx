@@ -26,6 +26,12 @@ export async function Footer() {
             >
               {t("privacy")}
             </Link>
+            <Link
+              href="/legal/refund"
+              className="text-sm text-muted-foreground transition-colors hover:text-foreground"
+            >
+              {t("refund")}
+            </Link>
             <a
               href={siteConfig.links.github}
               target="_blank"

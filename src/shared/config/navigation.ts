@@ -21,8 +21,9 @@ export interface NavItem {
  */
 export const marketingNav: NavItem[] = [
   { key: "home", href: "/", labelKey: "nav.home" },
-  { key: "pricing", href: "/pricing", labelKey: "nav.pricing" },
-  { key: "blog", href: "/blog", labelKey: "nav.blog" },
+  { key: "courses", href: "/courses", labelKey: "nav.courses" },
+  { key: "reviews", href: "/reviews", labelKey: "nav.reviews" },
+  { key: "contact", href: "/contact", labelKey: "nav.contact" },
 ] as const;
 
 /**
@@ -42,8 +43,8 @@ export const dashboardNav: NavItem[] = [
   {
     key: "dashboard",
     href: "/dashboard",
-    labelKey: "nav.dashboard",
-    icon: "LayoutDashboard",
+    labelKey: "nav.myCourses",
+    icon: "BookOpen",
   },
   {
     key: "settings",
@@ -71,7 +72,7 @@ export const dashboardNav: NavItem[] = [
  * Routes that require authentication.
  * Used by middleware for route protection.
  */
-export const protectedRoutes = ["/test"] as const;
+export const protectedRoutes = ["/dashboard", "/learn", "/admin"] as const;
 
 /**
  * Routes only accessible to unauthenticated users.

@@ -1,0 +1,553 @@
+{
+  "prd_source": "docs/PRD-lecture-platform.md",
+  "created_at": "2026-02-03T10:00:00Z",
+  "status": "approved",
+
+  "detected_tech_stack": {
+    "frontend": ["Next.js 16+ (App Router)", "React 19", "TypeScript 5.x (strict)", "Tailwind CSS 3.x", "shadcn/ui"],
+    "backend": ["Supabase Auth", "Polar SDK", "Resend", "Cloudflare R2"],
+    "database": ["PostgreSQL 15 (Supabase)", "Drizzle ORM"],
+    "video": ["hls.js", "FFmpeg (HLS encoding)", "Cloudflare R2 (storage/CDN)"],
+    "new_dependencies": ["hls.js", "embla-carousel-react", "@dnd-kit/core", "recharts", "rehype-pretty-code", "@vercel/og", "@aws-sdk/client-s3"]
+  },
+
+  "detected_skills": [
+    "vercel-react-best-practices",
+    "supabase-postgres-best-practices",
+    "web-design-guidelines"
+  ],
+
+  "detected_mcp_servers": [],
+
+  "tasks": [
+    {
+      "id": "task-001",
+      "title": "DB 스키마 확장 — users 테이블 role 컬럼 추가 + 신규 테이블 생성",
+      "description": "기존 users 테이블에 role enum('user','admin') 컬럼 추가. 신규 테이블 생성: courses, chapters, lessons, enrollments, progress, reviews, discussions, comments, coupons. PRD 섹션 7 데이터 모델 기반. Drizzle ORM 스키마 파일 작성 (src/db/schema/). 마이그레이션 생성 및 적용.",
+      "skills": ["supabase-postgres-best-practices"],
+      "priority": "high",
+      "estimated_hours": 3,
+      "dependencies": [],
+      "acceptance_criteria": [
+        "users 테이블에 role enum 컬럼 추가됨",
+        "courses, chapters, lessons 테이블 생성 (cascade 관계)",
+        "enrollments 테이블 (user_id + course_id unique 제약조건)",
+        "progress 테이블 (user_id + lesson_id unique 제약조건)",
+        "reviews 테이블 (user_id + course_id unique 제약조건, rating 1-5)",
+        "discussions, comments 테이블 (cascade 관계)",
+        "coupons 테이블 (code unique, discount_type enum)",
+        "pnpm db:generate && pnpm db:push 성공",
+        "src/db/schema/index.ts에서 모든 스키마 re-export"
+      ]
+    },
+    {
+      "id": "task-002",
+      "title": "Entity 레이어 — course, lesson, enrollment, progress, review, discussion 엔티티 생성",
+      "description": "FSD entities 레이어에 신규 엔티티 슬라이스 생성. 각 엔티티별 types, SWR hooks, API 호출 함수 작성. PRD 섹션 8.2 API 엔드포인트 기반. 기존 user/subscription/payment 엔티티 패턴 따름.",
+      "skills": ["vercel-react-best-practices"],
+      "priority": "high",
+      "estimated_hours": 4,
+      "dependencies": ["task-001"],
+      "acceptance_criteria": [
+        "src/entities/course/ — Course 타입, useCourses(), useCourse(slug) hooks",
+        "src/entities/lesson/ — Lesson 타입, useLesson() hook",
+        "src/entities/enrollment/ — Enrollment 타입, useEnrollments(), useEnrollment(courseId) hooks",
+        "src/entities/progress/ — Progress 타입, useProgress(courseSlug) hook",
+        "src/entities/review/ — Review 타입, useReviews(courseSlug) hook",
+        "src/entities/discussion/ — Discussion/Comment 타입, useDiscussions(lessonId) hook",
+        "각 엔티티 index.ts barrel export",
+        "기존 패턴(SWR + API route fetch) 따름"
+      ]
+    },
+    {
+      "id": "task-003",
+      "title": "공개 API Routes — 강의 목록, 강의 상세, 리뷰 조회",
+      "description": "인증 불필요한 공개 API 엔드포인트 구현. GET /api/courses (카테고리 필터), GET /api/courses/[slug] (커리큘럼 포함), GET /api/courses/[slug]/reviews, GET /api/reviews. Drizzle ORM 쿼리 + 기존 API 응답 형식(successResponse/errorResponse) 사용.",
+      "skills": ["supabase-postgres-best-practices"],
+      "priority": "high",
+      "estimated_hours": 3,
+      "dependencies": ["task-001"],
+      "acceptance_criteria": [
+        "GET /api/courses — 공개 강의 목록 (is_published=true), 카테고리별 필터, reviewCount/averageRating 포함",
+        "GET /api/courses/[slug] — 강의 상세 + chapters + lessons (ordered), totalDuration/totalLessons 계산",
+        "GET /api/courses/[slug]/reviews — 페이지네이션 지원 리뷰 목록",
+        "GET /api/reviews — 전체 리뷰 목록 (최근 6개월, 강의명 포함)",
+        "기존 API 응답 형식 준수 ({ success, data } / { success, error })",
+        "Zod validation on query params"
+      ]
+    },
+    {
+      "id": "task-004",
+      "title": "인증 API Routes — 등록/학습/진도/토론/리뷰",
+      "description": "로그인 필수 API 엔드포인트 구현. enrollments, checkout, learn, progress, discussions, comments, reviews CRUD. Supabase Auth 미들웨어로 인증 확인. PRD 섹션 8.2 기반.",
+      "skills": ["supabase-postgres-best-practices"],
+      "priority": "high",
+      "estimated_hours": 6,
+      "dependencies": ["task-001"],
+      "acceptance_criteria": [
+        "GET /api/enrollments — 내 등록 목록 (진도율 포함)",
+        "GET /api/enrollments/[courseId] — 특정 강의 등록 상태",
+        "POST /api/checkout/[courseSlug] — Polar 결제 세션 생성 (기존 결제 플로우 확장)",
+        "GET /api/learn/[courseSlug] — 커리큘럼 + 진도 데이터 (enrollment 확인)",
+        "GET /api/learn/[courseSlug]/lessons/[lessonId] — R2 Presigned URL 발급 (enrollment 확인)",
+        "PATCH /api/progress/[lessonId] — 진도 업데이트 (position, completed)",
+        "GET/POST /api/discussions/[lessonId] — 레슨별 토론 목록/작성",
+        "PATCH/DELETE /api/discussions/[discussionId] — 게시글 수정/삭제",
+        "POST /api/discussions/[discussionId]/comments — 댓글 작성",
+        "PATCH/DELETE /api/comments/[commentId] — 댓글 수정/삭제",
+        "POST/PATCH/DELETE /api/reviews — 리뷰 CRUD (진도율 50% 이상 확인)",
+        "레이트 제한 적용 (진도 저장 12req/분)"
+      ]
+    },
+    {
+      "id": "task-005",
+      "title": "관리자 API Routes — 강의 CRUD, 회원/매출/쿠폰 관리",
+      "description": "Admin role 필수 API 엔드포인트 구현. 강의/챕터/레슨 CRUD, 순서 변경, 회원 목록, 매출 통계, 쿠폰 CRUD. users.role === 'admin' 검증 미들웨어.",
+      "skills": ["supabase-postgres-best-practices"],
+      "priority": "high",
+      "estimated_hours": 5,
+      "dependencies": ["task-001"],
+      "acceptance_criteria": [
+        "Admin role 검증 미들웨어/헬퍼 함수 생성",
+        "POST/PATCH/DELETE /api/admin/courses — 강의 CRUD",
+        "POST /api/admin/courses/[id]/chapters — 챕터 추가",
+        "PATCH /api/admin/chapters/[id] — 챕터 수정",
+        "POST /api/admin/chapters/[id]/lessons — 레슨 추가",
+        "PATCH /api/admin/lessons/[id] — 레슨 수정",
+        "PATCH /api/admin/courses/[id]/reorder — 챕터/레슨 순서 변경",
+        "GET /api/admin/users — 회원 목록 (검색, 페이지네이션)",
+        "GET /api/admin/analytics — 매출 통계",
+        "POST/GET/DELETE /api/admin/coupons — 쿠폰 CRUD",
+        "모든 관리자 라우트에 admin 검증 적용"
+      ]
+    },
+    {
+      "id": "task-006",
+      "title": "미들웨어 확장 — dashboard/learn/admin 라우트 보호",
+      "description": "src/middleware.ts 업데이트. PROTECTED_ROUTES에 /dashboard, /learn 추가. 신규 admin 라우트 보호 (role === 'admin' 확인). 기존 미들웨어 체인에 통합.",
+      "skills": [],
+      "priority": "high",
+      "estimated_hours": 1,
+      "dependencies": ["task-001"],
+      "acceptance_criteria": [
+        "PROTECTED_ROUTES에 /dashboard, /learn 포함",
+        "/admin 라우트는 인증 + admin role 검증",
+        "미인증 사용자 → /login 리다이렉트 (redirectTo 포함)",
+        "비 admin 사용자의 /admin 접근 → /dashboard 리다이렉트",
+        "기존 미들웨어 체인 (next-intl → supabase → route protection) 유지"
+      ]
+    },
+    {
+      "id": "task-007",
+      "title": "Header/Footer 위젯 업데이트 — 강의 플랫폼 네비게이션",
+      "description": "기존 Header/Footer 위젯 수정. 네비게이션 항목을 강의 플랫폼에 맞게 변경: 강의, 리뷰, 문의. Footer에 환불정책 링크 추가. navigation.ts 설정 업데이트.",
+      "skills": ["web-design-guidelines"],
+      "priority": "high",
+      "estimated_hours": 2,
+      "dependencies": [],
+      "acceptance_criteria": [
+        "Header 마케팅 네비게이션: 강의(/courses), 리뷰(/reviews), 문의(/contact)",
+        "Header 대시보드 네비게이션: 내 강의(/dashboard), 설정(/dashboard/settings)",
+        "Footer에 환불정책(/legal/refund) 링크 추가",
+        "navigation.ts 설정 업데이트",
+        "i18n 번역 키 추가 (ko/en)",
+        "기존 테마 토글/언어 전환 위젯 유지"
+      ]
+    },
+    {
+      "id": "task-008",
+      "title": "랜딩 페이지 리뉴얼 — 드림코딩 벤치마킹",
+      "description": "기존 랜딩 위젯(src/widgets/landing/) 리뉴얼. 히어로 섹션, 추천 강의 캐러셀(Embla Carousel), 가치 제안 카드, 카테고리별 강의 섹션, 리뷰 하이라이트. PRD 섹션 4.3 FR-COURSE-001 + 섹션 10.3 와이어프레임 기반.",
+      "skills": ["vercel-react-best-practices", "web-design-guidelines"],
+      "priority": "high",
+      "estimated_hours": 6,
+      "dependencies": ["task-002", "task-003", "task-007"],
+      "acceptance_criteria": [
+        "히어로 섹션 — 슬로건, 부제목, CTA 버튼, 히어로 이미지/GIF",
+        "추천 강의 캐러셀 — Embla Carousel, 7개 카드, 페이지네이션 인디케이터",
+        "가치 제안 — 3개 카드 (교육 철학/방법론)",
+        "카테고리별 강의 섹션 — 프론트엔드 기본/심화, 백엔드 등",
+        "리뷰 하이라이트 — 수강평 발췌 + '더 많은 후기 보러가기' 링크",
+        "반응형 (1열/2열/3열)",
+        "이미지 lazy loading",
+        "LCP < 2.5초",
+        "i18n 지원 (ko/en)"
+      ]
+    },
+    {
+      "id": "task-009",
+      "title": "CourseCard 위젯 + 강의 목록 페이지",
+      "description": "CourseCard 위젯 (src/widgets/course-card/) 생성. 강의 목록 페이지 (/courses) 구현. 카테고리별 그룹으로 카드 그리드 나열. PRD FR-COURSE-002 기반.",
+      "skills": ["vercel-react-best-practices", "web-design-guidelines"],
+      "priority": "high",
+      "estimated_hours": 3,
+      "dependencies": ["task-002", "task-003", "task-007"],
+      "acceptance_criteria": [
+        "CourseCard — 애니메이션 썸네일(GIF/WebP), 난이도 뱃지(초급/중급/고급 색상), 제목, 짧은 설명, 리뷰 수",
+        "강의 목록 페이지 — 카테고리별 섹션 구분",
+        "반응형 그리드 (1열/2열/3열)",
+        "이미지 lazy loading",
+        "i18n 지원",
+        "빈 상태 처리"
+      ]
+    },
+    {
+      "id": "task-010",
+      "title": "강의 상세 페이지 — 커리큘럼, 미리보기, 구매 위젯, FAQ",
+      "description": "강의 상세 페이지 (/courses/[slug]) 구현. 히어로 배너, 소개 영상, Sticky 구매 위젯, 기술 스택 그리드, 커리큘럼 아코디언, 강사 소개, 수강평, FAQ, 관련 강의. PRD FR-COURSE-003 + 와이어프레임 기반. course-detail, curriculum, instructor, pricing-widget, review-list 위젯 생성.",
+      "skills": ["vercel-react-best-practices", "web-design-guidelines"],
+      "priority": "high",
+      "estimated_hours": 8,
+      "dependencies": ["task-002", "task-003", "task-009"],
+      "acceptance_criteria": [
+        "히어로 배너 — 강의 제목, 부제목, 등록 CTA",
+        "소개 영상 플레이어 — 미리보기 영상 재생",
+        "Sticky 구매 위젯 — 데스크톱 사이드바 고정, 모바일 하단 고정. 가격, 포함사항, CTA",
+        "기술 스택 그리드 — 강의에서 다루는 기술 아이콘",
+        "커리큘럼 아코디언 — 챕터별 펼치기/접기, 레슨 목록(제목, 시간, 미리보기 뱃지)",
+        "강사 소개 섹션",
+        "수강평 섹션 — 평균 별점, 리뷰 목록",
+        "FAQ 아코디언",
+        "구매 완료 사용자 → '이어서 학습하기' 버튼",
+        "SEO 메타 태그 + 동적 OG 이미지(@vercel/og)",
+        "반응형"
+      ]
+    },
+    {
+      "id": "task-011",
+      "title": "결제 연동 확장 — Polar 강의 구매 + Webhook + Enrollment 생성",
+      "description": "기존 Polar 결제 플로우를 강의 구매에 맞게 확장. POST /api/checkout/[courseSlug] → Polar checkout 생성 → Webhook으로 enrollment 자동 생성. 결제 확인 이메일(Resend) 발송. 쿠폰 적용은 P1.",
+      "skills": [],
+      "priority": "high",
+      "estimated_hours": 4,
+      "dependencies": ["task-004"],
+      "acceptance_criteria": [
+        "POST /api/checkout/[courseSlug] — 강의 가격으로 Polar checkout 세션 생성",
+        "Webhook 핸들러 확장 — checkout.completed → enrollment 자동 생성",
+        "무료 강의 즉시 등록 (결제 없이)",
+        "결제 확인 이메일 템플릿 (Resend + React Email)",
+        "이미 구매한 강의 재구매 방지",
+        "결제 실패 처리"
+      ]
+    },
+    {
+      "id": "task-012",
+      "title": "비디오 플레이어 위젯 — hls.js + 커스텀 컨트롤 UI",
+      "description": "VideoPlayer 위젯 (src/widgets/video-player/) 구현. hls.js로 HLS 스트리밍 재생. Tailwind 기반 커스텀 컨트롤 UI. Safari 네이티브 HLS 지원. PRD FR-LEARN-001 기반.",
+      "skills": ["vercel-react-best-practices"],
+      "priority": "high",
+      "estimated_hours": 6,
+      "dependencies": [],
+      "acceptance_criteria": [
+        "hls.js HLS 스트리밍 재생 (master.m3u8 → 어댑티브 비트레이트)",
+        "Safari 네이티브 HLS 감지 및 폴백",
+        "커스텀 컨트롤 UI — 재생/일시정지, 시크바, 볼륨, 배속(0.5x~2x), 화질(720p/1080p), 전체화면",
+        "키보드 단축키 — Space(재생/정지), ←→(10초), ↑↓(볼륨)",
+        "버퍼링 상태 표시",
+        "모바일 터치 제스처 지원",
+        "Tailwind 다크모드 지원"
+      ]
+    },
+    {
+      "id": "task-013",
+      "title": "학습 페이지 — 3단 레이아웃 (커리큘럼/플레이어+MDX설명/토론)",
+      "description": "학습 페이지 (/learn/[courseSlug]/[lessonId]) 구현. 3단 레이아웃: 좌측 커리큘럼 사이드바, 중앙 비디오 플레이어 + 레슨 MDX 설명, 우측 토론 패널. 패널 토글. 모바일 하단 시트. PRD FR-LEARN-003 + 와이어프레임 기반.",
+      "skills": ["vercel-react-best-practices", "web-design-guidelines"],
+      "priority": "high",
+      "estimated_hours": 8,
+      "dependencies": ["task-002", "task-004", "task-012"],
+      "acceptance_criteria": [
+        "3단 레이아웃 — 커리큘럼(240px) | 플레이어+설명(fluid) | 토론(320px)",
+        "커리큘럼 사이드바 — 챕터/레슨 목록, 완료 상태 아이콘, 현재 레슨 하이라이트, 진도 바",
+        "좌/우 패널 개별 토글 (닫으면 플레이어 확장)",
+        "레슨 MDX 설명 — rehype-pretty-code 코드 하이라이팅",
+        "이전/다음 레슨 버튼",
+        "'완료하고 다음으로' 수동 완료 버튼",
+        "URL이 레슨별로 변경 (공유 가능)",
+        "모바일 — 패널 숨김, 하단 탭으로 커리큘럼/토론 전환",
+        "R2 Presigned URL로 비디오 재생",
+        "enrollment 확인 (미등록 시 강의 상세로 리다이렉트)"
+      ]
+    },
+    {
+      "id": "task-014",
+      "title": "진도 저장 시스템 — 자동/수동 완료 + 진도율 계산",
+      "description": "진도 저장 기능 구현. 5초 간격 자동 저장 (재생 위치), 90% 이상 시청 시 자동 완료, 수동 완료 버튼. 챕터별 + 전체 진도율 계산. PRD FR-LEARN-002 기반.",
+      "skills": [],
+      "priority": "high",
+      "estimated_hours": 3,
+      "dependencies": ["task-004", "task-012"],
+      "acceptance_criteria": [
+        "PATCH /api/progress/[lessonId] — 5초 간격 자동 호출 (position 업데이트)",
+        "90% 이상 시청 → completed: true 자동 처리",
+        "'완료하고 다음으로' 버튼 → completed: true + 다음 레슨 이동",
+        "챕터별 진도율 계산 (completed lessons / total lessons)",
+        "전체 진도율 계산",
+        "이어보기 — 마지막 재생 위치에서 시작",
+        "레이트 제한 준수 (12req/분)"
+      ]
+    },
+    {
+      "id": "task-015",
+      "title": "토론 패널 위젯 — 게시글 + 댓글 CRUD",
+      "description": "DiscussionPanel 위젯 (src/widgets/discussion-panel/) 구현. 레슨별 토론 게시글 + 댓글. 작성/수정/삭제. 관리자 삭제 권한. PRD FR-LEARN-004 기반.",
+      "skills": ["vercel-react-best-practices"],
+      "priority": "high",
+      "estimated_hours": 4,
+      "dependencies": ["task-002", "task-004"],
+      "acceptance_criteria": [
+        "게시글 목록 — 제목, 본문 미리보기, 작성자, 작성일, 댓글 수",
+        "게시글 작성 폼 (react-hook-form + Zod)",
+        "게시글 수정/삭제 (본인 것만, 관리자는 모두 삭제 가능)",
+        "댓글 목록 (1단계, 게시글 하위)",
+        "댓글 작성/수정/삭제",
+        "레슨별 스코프 (해당 레슨 토론만 표시)",
+        "빈 상태 처리",
+        "i18n 지원"
+      ]
+    },
+    {
+      "id": "task-016",
+      "title": "수강생 대시보드 — 내 강의 + 진도율 + 이어서 학습",
+      "description": "대시보드 페이지 (/dashboard) 리뉴얼. 구매한 강의 카드 목록, 강의별 진도율 프로그레스 바, 마지막 학습일, '이어서 학습하기' 버튼. PRD FR-DASH-001 기반.",
+      "skills": ["vercel-react-best-practices", "web-design-guidelines"],
+      "priority": "high",
+      "estimated_hours": 3,
+      "dependencies": ["task-002", "task-004"],
+      "acceptance_criteria": [
+        "구매한 강의 카드 그리드",
+        "강의별 진도율 프로그레스 바",
+        "마지막 학습일 표시",
+        "'이어서 학습하기' 버튼 → 마지막 학습 레슨으로 이동",
+        "빈 상태 (구매 강의 없음 → 강의 둘러보기 CTA)",
+        "반응형",
+        "i18n 지원"
+      ]
+    },
+    {
+      "id": "task-017",
+      "title": "문의 페이지 + 리뷰 모아보기 페이지 + 환불정책 페이지",
+      "description": "3개 신규 마케팅 페이지 구현. /contact (이메일 연락처), /reviews (전체 수강평 피드), /legal/refund (환불정책 MDX). PRD FR-CONTACT-001, FR-REVIEW-002 기반.",
+      "skills": ["web-design-guidelines"],
+      "priority": "medium",
+      "estimated_hours": 3,
+      "dependencies": ["task-003", "task-007"],
+      "acceptance_criteria": [
+        "문의 페이지 — 제목, 이메일 주소, 답변 소요일 안내, 일러스트",
+        "리뷰 모아보기 — 페이지 헤더, '최근 6개월 리뷰' 안내, 리뷰 카드 피드 (작성자, 강의명, 별점, 본문, 작성일)",
+        "환불정책 — MDX 콘텐츠 (기존 legal 페이지 패턴 따름)",
+        "i18n 지원 (ko/en)",
+        "반응형"
+      ]
+    },
+    {
+      "id": "task-018",
+      "title": "관리자 라우트 그룹 + 강의 CRUD UI",
+      "description": "신규 (admin) 라우트 그룹 생성. 관리자 대시보드, 강의 관리 (목록 + 생성 + 수정). 강의 기본 정보 폼, 챕터/레슨 관리 (추가/수정/삭제/드래그앤드롭 순서변경). @dnd-kit 사용. PRD FR-ADMIN-001 기반.",
+      "skills": ["vercel-react-best-practices", "web-design-guidelines"],
+      "priority": "high",
+      "estimated_hours": 8,
+      "dependencies": ["task-005", "task-006"],
+      "acceptance_criteria": [
+        "src/app/[locale]/(admin)/ 라우트 그룹 + admin 전용 레이아웃",
+        "/admin — 관리자 대시보드 (요약 통계 카드)",
+        "/admin/courses — 강의 목록 (모든 상태, 공개/비공개 뱃지)",
+        "/admin/courses/new — 강의 생성 폼 (react-hook-form + Zod)",
+        "/admin/courses/[id]/edit — 강의 수정 + 커리큘럼 편집",
+        "챕터/레슨 추가/수정/삭제",
+        "드래그앤드롭 순서 변경 (@dnd-kit)",
+        "미리보기 설정 (레슨별 is_preview 토글)",
+        "공개/비공개 설정",
+        "i18n 지원"
+      ]
+    },
+    {
+      "id": "task-019",
+      "title": "R2 연동 — 영상 업로드 + Presigned URL 발급",
+      "description": "Cloudflare R2 연동. @aws-sdk/client-s3로 R2 클라이언트 구성. Presigned URL 발급 API (enrollment 확인 후). 관리자 영상 업로드 지원 (초기: HLS 파일 수동 업로드). PRD 섹션 6.3 기반.",
+      "skills": [],
+      "priority": "high",
+      "estimated_hours": 3,
+      "dependencies": ["task-001"],
+      "acceptance_criteria": [
+        "src/shared/api/r2/ — R2 클라이언트 설정 (@aws-sdk/client-s3 S3Client)",
+        "Presigned URL 생성 유틸 (만료 시간 설정)",
+        "GET /api/learn/[courseSlug]/lessons/[lessonId] — enrollment 확인 후 HLS master.m3u8 Presigned URL 발급",
+        "미리보기(is_preview) 레슨 — 인증 없이 Presigned URL 제공",
+        "환경변수: R2_ACCOUNT_ID, R2_ACCESS_KEY_ID, R2_SECRET_ACCESS_KEY, R2_BUCKET_NAME, R2_PUBLIC_DOMAIN",
+        ".env.example 업데이트"
+      ]
+    },
+    {
+      "id": "task-020",
+      "title": "i18n 번역 확장 — 강의 플랫폼 번역 키 추가",
+      "description": "public/locales/{ko,en}/common.json에 강의 플랫폼 관련 번역 키 추가. course, learn, review, discussion, admin, contact, dashboard 네임스페이스.",
+      "skills": [],
+      "priority": "medium",
+      "estimated_hours": 2,
+      "dependencies": [],
+      "acceptance_criteria": [
+        "course.* — 강의 목록/상세 관련 키 (level badges, price, curriculum, enroll 등)",
+        "learn.* — 학습 페이지 키 (progress, complete, next, previous 등)",
+        "review.* — 리뷰 관련 키",
+        "discussion.* — 토론 관련 키",
+        "admin.* — 관리자 페이지 키",
+        "contact.* — 문의 페이지 키",
+        "dashboard.* — 대시보드 키 업데이트 (내 강의, 진도)",
+        "한국어/영어 모두 작성"
+      ]
+    },
+    {
+      "id": "task-021",
+      "title": "신규 패키지 설치 — hls.js, embla-carousel, @dnd-kit, recharts, @vercel/og, @aws-sdk/client-s3, rehype-pretty-code",
+      "description": "PRD에서 명시한 신규 의존성 패키지 설치. 기존 package.json에 추가.",
+      "skills": [],
+      "priority": "high",
+      "estimated_hours": 0.5,
+      "dependencies": [],
+      "acceptance_criteria": [
+        "pnpm add hls.js embla-carousel-react embla-carousel-autoplay @dnd-kit/core @dnd-kit/sortable @dnd-kit/utilities recharts @vercel/og @aws-sdk/client-s3 rehype-pretty-code",
+        "pnpm install 성공",
+        "pnpm typecheck 통과"
+      ]
+    },
+    {
+      "id": "task-022",
+      "title": "관리자 — 회원 관리 + 매출 대시보드 + 쿠폰 관리 UI",
+      "description": "/admin/users (회원 목록, 검색, 수동 등록), /admin/analytics (Recharts 매출 차트), /admin/coupons (쿠폰 CRUD). PRD FR-ADMIN-002~004 기반.",
+      "skills": ["vercel-react-best-practices", "web-design-guidelines"],
+      "priority": "medium",
+      "estimated_hours": 6,
+      "dependencies": ["task-005", "task-018"],
+      "acceptance_criteria": [
+        "/admin/users — 회원 목록 테이블 (이메일, 이름, 가입일, 구매 강의 수), 검색, 강의 수동 등록/해제",
+        "/admin/analytics — 일별/월별 매출 차트 (Recharts), 강의별 매출, 결제/환불 내역",
+        "/admin/coupons — 쿠폰 목록, 생성 폼 (할인 유형, 적용 대상, 유효기간, 사용 횟수), 삭제",
+        "i18n 지원",
+        "반응형"
+      ]
+    },
+    {
+      "id": "task-023",
+      "title": "Webhook 확장 — Polar 강의 결제 이벤트 처리",
+      "description": "기존 Polar webhook 핸들러 확장. 강의 결제 완료 시 enrollment 생성, 결제 확인 이메일, 환불 처리. 기존 subscription webhook과 공존.",
+      "skills": [],
+      "priority": "high",
+      "estimated_hours": 3,
+      "dependencies": ["task-001", "task-011"],
+      "acceptance_criteria": [
+        "checkout.completed → metadata에서 courseSlug 확인 → enrollment 생성",
+        "order.created → payments 레코드 생성",
+        "결제 확인 이메일 발송 (SubscriptionEmail 패턴 참고한 CourseEnrollmentEmail 템플릿)",
+        "기존 subscription webhook과 분기 처리 (metadata 기반)",
+        "환불 webhook → enrollment 삭제 또는 비활성화"
+      ]
+    },
+    {
+      "id": "task-024",
+      "title": "SEO + 사이트맵 + OG 이미지 — 강의 페이지 최적화",
+      "description": "강의 관련 페이지 SEO 메타 태그, 동적 사이트맵(/sitemap.xml), @vercel/og 동적 OG 이미지 생성. robots.txt.",
+      "skills": [],
+      "priority": "medium",
+      "estimated_hours": 3,
+      "dependencies": ["task-010"],
+      "acceptance_criteria": [
+        "강의 상세 페이지 — 동적 메타 태그 (title, description, og:image)",
+        "동적 OG 이미지 — @vercel/og (Satori)로 강의 제목/썸네일 기반 생성",
+        "/sitemap.xml — 강의 목록, 강의 상세 URL 포함 (동적 생성)",
+        "/robots.txt",
+        "구조화 데이터 (Course schema.org)"
+      ]
+    },
+    {
+      "id": "task-025",
+      "title": "이메일 템플릿 추가 — 결제 완료, 환불 완료",
+      "description": "Resend + React Email 템플릿 추가. CourseEnrollmentEmail (결제 확인), RefundEmail (환불 완료). 기존 템플릿 패턴 따름.",
+      "skills": [],
+      "priority": "medium",
+      "estimated_hours": 2,
+      "dependencies": [],
+      "acceptance_criteria": [
+        "CourseEnrollmentEmail — 강의명, 가격, 학습 시작 URL",
+        "RefundEmail — 강의명, 환불 금액, 환불 사유",
+        "기존 이메일 디자인 패턴 유지 (흰색 컨테이너, 로고 푸터)",
+        "ko/en 지원 (i18n 기반 또는 locale 파라미터)",
+        "pnpm email:dev 미리보기 가능"
+      ]
+    },
+    {
+      "id": "task-026",
+      "title": "단위 테스트 — 유틸, Zod 스키마, 진도 계산, 쿠폰 계산",
+      "description": "PRD 섹션 12.2에 명시된 단위 테스트 작성. 가격 포맷팅, 진도율 계산, 쿠폰 할인 계산, Zod 검증 스키마, 환불 가능 여부 판정.",
+      "skills": [],
+      "priority": "medium",
+      "estimated_hours": 3,
+      "dependencies": ["task-001", "task-002"],
+      "acceptance_criteria": [
+        "가격 포맷팅 유틸 테스트 (KRW/USD)",
+        "진도율 계산 로직 테스트",
+        "쿠폰 할인 계산 테스트 (정액/정률, 유효기간, 사용 횟수)",
+        "Zod 검증 스키마 테스트 (리뷰, 강의 생성, 토론 등)",
+        "환불 가능 여부 판정 테스트 (7일 이내 AND 시청 5개 미만)",
+        "기존 테스트 패턴(src/__tests__/) 따름"
+      ]
+    },
+    {
+      "id": "task-027",
+      "title": "컴포넌트 테스트 — CourseCard, Curriculum, DiscussionPanel, ReviewCard, PricingWidget",
+      "description": "PRD 섹션 12.2에 명시된 컴포넌트 테스트. 기존 i18n 모킹 패턴 사용.",
+      "skills": [],
+      "priority": "medium",
+      "estimated_hours": 4,
+      "dependencies": ["task-009", "task-010", "task-015"],
+      "acceptance_criteria": [
+        "CourseCard 렌더링 테스트 (제목, 뱃지, 리뷰 수)",
+        "Curriculum 아코디언 테스트 (펼치기/접기)",
+        "DiscussionPanel 게시글/댓글 렌더링 테스트",
+        "ReviewCard 별점 표시 테스트",
+        "PricingWidget 테스트 (가격 표시, CTA 상태 — 구매/이어보기)",
+        "패널 토글 동작 테스트 (열기/닫기)"
+      ]
+    }
+  ],
+
+  "execution_order": [
+    "task-021", "task-020", "task-025", "task-007", "task-012",
+    "task-001",
+    "task-006", "task-002", "task-003", "task-004", "task-005", "task-019",
+    "task-008", "task-009", "task-017", "task-015", "task-016", "task-011", "task-014", "task-026",
+    "task-010", "task-013", "task-018", "task-023",
+    "task-022", "task-024", "task-027"
+  ],
+
+  "execution_phases": [
+    {
+      "phase": 0,
+      "tasks": ["task-021", "task-020", "task-025", "task-007", "task-012", "task-001"],
+      "description": "Foundation — 패키지 설치, i18n, 이메일 템플릿, Header/Footer, 비디오 플레이어, DB 스키마 (의존성 없음)"
+    },
+    {
+      "phase": 1,
+      "tasks": ["task-006", "task-002", "task-003", "task-004", "task-005", "task-019"],
+      "description": "Core API/Entity — 미들웨어, 엔티티, 공개/인증/관리자 API, R2 연동 (DB 스키마 의존)"
+    },
+    {
+      "phase": 2,
+      "tasks": ["task-008", "task-009", "task-017", "task-015", "task-016", "task-011", "task-014", "task-026"],
+      "description": "Pages & Features — 랜딩, 강의 목록, 문의/리뷰 페이지, 토론, 대시보드, 결제, 진도, 테스트 (엔티티+API 의존)"
+    },
+    {
+      "phase": 3,
+      "tasks": ["task-010", "task-013", "task-018", "task-023"],
+      "description": "Complex Pages — 강의 상세, 학습 페이지, 관리자 CRUD, Webhook 확장 (Phase 2 위젯 의존)"
+    },
+    {
+      "phase": 4,
+      "tasks": ["task-022", "task-024", "task-027"],
+      "description": "Polish — 관리자 추가 기능, SEO, 컴포넌트 테스트 (Phase 3 의존)"
+    }
+  ],
+  "max_parallelism": 8,
+
+  "total_estimated_hours": 101
+}

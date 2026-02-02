@@ -26,7 +26,12 @@
     "register": "회원가입",
     "settingsProfile": "프로필",
     "settingsAccount": "계정",
-    "menu": "메뉴"
+    "menu": "메뉴",
+    "courses": "강의",
+    "reviews": "리뷰",
+    "contact": "문의",
+    "myCourses": "내 강의",
+    "admin": "관리자"
   },
   "auth": {
     "login": {
@@ -96,9 +101,10 @@
   },
   "footer": {
     "copyright": "모든 권리 보유.",
-    "description": "SaaS 보일러플레이트",
+    "description": "코딩 강의 플랫폼",
     "terms": "이용약관",
-    "privacy": "개인정보처리방침"
+    "privacy": "개인정보처리방침",
+    "refund": "환불정책"
   },
   "legal": {
     "terms": {
@@ -143,6 +149,14 @@
       "editProfile": "프로필 수정",
       "accountSettings": "계정 설정",
       "viewPricing": "요금제 보기"
+    },
+    "myCourses": {
+      "title": "내 강의",
+      "empty": "수강 중인 강의가 없습니다",
+      "emptyDescription": "다양한 강의를 둘러보고 학습을 시작해보세요.",
+      "browseCourses": "강의 둘러보기",
+      "lastStudied": "마지막 학습: {date}",
+      "continueLearning": "이어서 학습하기"
     }
   },
   "settings": {
@@ -316,5 +330,260 @@
       "q4": "Enterprise 플랜은 어떻게 구매하나요?",
       "a4": "Enterprise 플랜은 온라인으로 구독하거나 영업팀에 문의할 수 있습니다."
     }
+  },
+  "course": {
+    "title": "강의",
+    "allCourses": "전체 강의",
+    "category": "카테고리",
+    "level": {
+      "beginner": "초급",
+      "intermediate": "중급",
+      "advanced": "고급"
+    },
+    "price": "가격",
+    "free": "무료",
+    "currency": "원",
+    "lessons": "{count}개 레슨",
+    "totalDuration": "총 {hours}시간 {minutes}분",
+    "students": "{count}명 수강",
+    "rating": "평점 {score}",
+    "reviewCount": "수강평 {count}개",
+    "curriculum": "커리큘럼",
+    "chapter": "챕터",
+    "lesson": "레슨",
+    "preview": "미리보기",
+    "enroll": "수강하기",
+    "enrolled": "수강 중",
+    "continueLearning": "이어서 학습하기",
+    "buyNow": "지금 구매하기",
+    "includes": "포함 사항",
+    "lifetimeAccess": "평생 수강 가능",
+    "certificate": "수료증 발급",
+    "discussionAccess": "토론 참여",
+    "techStack": "다루는 기술",
+    "instructor": {
+      "title": "강사 소개",
+      "about": "소개"
+    },
+    "faq": {
+      "title": "자주 묻는 질문"
+    },
+    "relatedCourses": "관련 강의",
+    "empty": "등록된 강의가 없습니다",
+    "emptyDescription": "곧 새로운 강의가 추가됩니다.",
+    "detail": {
+      "hero": {
+        "enrollCta": "수강 신청하기",
+        "previewVideo": "소개 영상 보기"
+      }
+    }
+  },
+  "learn": {
+    "title": "학습",
+    "progress": "진도율",
+    "progressPercent": "{percent}% 완료",
+    "complete": "완료",
+    "completed": "학습 완료",
+    "incomplete": "미완료",
+    "markComplete": "완료하고 다음으로",
+    "nextLesson": "다음 레슨",
+    "previousLesson": "이전 레슨",
+    "currentLesson": "현재 레슨",
+    "resumeAt": "이어보기",
+    "autoComplete": "자동 완료됨",
+    "chapterProgress": "챕터 진도",
+    "overallProgress": "전체 진도",
+    "lastStudied": "마지막 학습",
+    "sidebar": {
+      "curriculum": "커리큘럼",
+      "discussion": "토론"
+    },
+    "player": {
+      "play": "재생",
+      "pause": "일시정지",
+      "volume": "볼륨",
+      "mute": "음소거",
+      "unmute": "음소거 해제",
+      "speed": "배속",
+      "quality": "화질",
+      "fullscreen": "전체화면",
+      "exitFullscreen": "전체화면 해제",
+      "buffering": "버퍼링 중...",
+      "seekForward": "10초 앞으로",
+      "seekBackward": "10초 뒤로"
+    },
+    "notEnrolled": "수강 등록이 필요합니다",
+    "notEnrolledDescription": "이 강의를 수강하려면 먼저 등록해주세요.",
+    "goToCourse": "강의 상세로 이동"
+  },
+  "review": {
+    "title": "수강평",
+    "allReviews": "전체 수강평",
+    "recentReviews": "최근 6개월 수강평",
+    "write": "수강평 작성",
+    "edit": "수강평 수정",
+    "delete": "수강평 삭제",
+    "deleteConfirm": "수강평을 삭제하시겠습니까?",
+    "rating": "별점",
+    "content": "수강평 내용",
+    "contentPlaceholder": "강의에 대한 솔직한 후기를 남겨주세요",
+    "submit": "등록",
+    "update": "수정",
+    "success": "수강평이 등록되었습니다",
+    "updateSuccess": "수강평이 수정되었습니다",
+    "deleteSuccess": "수강평이 삭제되었습니다",
+    "progressRequired": "진도율 50% 이상일 때 수강평을 작성할 수 있습니다",
+    "alreadyReviewed": "이미 수강평을 작성했습니다",
+    "averageRating": "평균 별점",
+    "totalReviews": "총 {count}개의 수강평",
+    "moreReviews": "더 많은 후기 보러가기",
+    "empty": "아직 수강평이 없습니다",
+    "emptyDescription": "첫 번째 수강평을 작성해보세요.",
+    "byStudent": "{name}님의 수강평",
+    "forCourse": "{course} 수강평"
+  },
+  "discussion": {
+    "title": "토론",
+    "newPost": "새 글 작성",
+    "editPost": "글 수정",
+    "deletePost": "글 삭제",
+    "deletePostConfirm": "게시글을 삭제하시겠습니까?",
+    "postTitle": "제목",
+    "postTitlePlaceholder": "질문이나 의견의 제목을 입력하세요",
+    "postContent": "내용",
+    "postContentPlaceholder": "자세한 내용을 작성해주세요",
+    "submit": "등록",
+    "update": "수정",
+    "comments": "댓글",
+    "commentCount": "댓글 {count}개",
+    "writeComment": "댓글 작성",
+    "commentPlaceholder": "댓글을 입력하세요",
+    "editComment": "댓글 수정",
+    "deleteComment": "댓글 삭제",
+    "deleteCommentConfirm": "댓글을 삭제하시겠습니까?",
+    "empty": "아직 토론이 없습니다",
+    "emptyDescription": "첫 번째 질문이나 의견을 남겨보세요.",
+    "byAuthor": "{name}님",
+    "createdAt": "{date} 작성"
+  },
+  "admin": {
+    "title": "관리자",
+    "dashboard": {
+      "title": "관리자 대시보드",
+      "totalCourses": "전체 강의",
+      "totalStudents": "전체 수강생",
+      "totalRevenue": "총 매출",
+      "totalEnrollments": "총 등록"
+    },
+    "courses": {
+      "title": "강의 관리",
+      "create": "새 강의 만들기",
+      "edit": "강의 수정",
+      "delete": "강의 삭제",
+      "deleteConfirm": "강의를 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.",
+      "published": "공개",
+      "unpublished": "비공개",
+      "publish": "공개하기",
+      "unpublish": "비공개하기",
+      "form": {
+        "title": "강의 제목",
+        "slug": "URL 슬러그",
+        "description": "강의 설명",
+        "shortDescription": "짧은 설명",
+        "category": "카테고리",
+        "level": "난이도",
+        "price": "가격",
+        "thumbnailUrl": "썸네일 URL",
+        "previewVideoUrl": "미리보기 영상 URL"
+      }
+    },
+    "chapters": {
+      "title": "챕터 관리",
+      "add": "챕터 추가",
+      "edit": "챕터 수정",
+      "delete": "챕터 삭제",
+      "reorder": "순서 변경",
+      "form": {
+        "title": "챕터 제목"
+      }
+    },
+    "lessons": {
+      "title": "레슨 관리",
+      "add": "레슨 추가",
+      "edit": "레슨 수정",
+      "delete": "레슨 삭제",
+      "isPreview": "미리보기 허용",
+      "form": {
+        "title": "레슨 제목",
+        "videoUrl": "영상 URL",
+        "duration": "영상 길이 (초)",
+        "description": "레슨 설명 (MDX)"
+      }
+    },
+    "users": {
+      "title": "회원 관리",
+      "search": "이메일 또는 이름으로 검색",
+      "email": "이메일",
+      "name": "이름",
+      "joinedAt": "가입일",
+      "enrolledCourses": "수강 강의 수",
+      "manualEnroll": "수동 등록",
+      "removeEnrollment": "등록 해제"
+    },
+    "analytics": {
+      "title": "매출 통계",
+      "daily": "일별",
+      "monthly": "월별",
+      "revenue": "매출",
+      "byCourse": "강의별 매출",
+      "payments": "결제 내역",
+      "refunds": "환불 내역"
+    },
+    "coupons": {
+      "title": "쿠폰 관리",
+      "create": "쿠폰 생성",
+      "delete": "쿠폰 삭제",
+      "code": "쿠폰 코드",
+      "discountType": "할인 유형",
+      "discountFixed": "정액 할인",
+      "discountPercent": "정률 할인",
+      "discountAmount": "할인 금액",
+      "discountRate": "할인율",
+      "validFrom": "시작일",
+      "validUntil": "만료일",
+      "maxUses": "최대 사용 횟수",
+      "usedCount": "사용 횟수",
+      "appliesTo": "적용 대상",
+      "allCourses": "전체 강의",
+      "specificCourse": "특정 강의"
+    }
+  },
+  "contact": {
+    "title": "문의하기",
+    "description": "궁금한 점이 있으시면 아래 이메일로 문의해 주세요.",
+    "email": "문의 이메일",
+    "responseTime": "보통 1~2 영업일 이내에 답변드립니다.",
+    "illustration": "문의 안내"
+  },
+  "refund": {
+    "title": "환불정책",
+    "description": "강의 환불 정책을 확인하세요"
+  },
+  "checkout": {
+    "title": "결제",
+    "processing": "결제 처리 중...",
+    "success": "결제가 완료되었습니다",
+    "successDescription": "강의 등록이 완료되었습니다. 지금 바로 학습을 시작하세요!",
+    "failed": "결제에 실패했습니다",
+    "failedDescription": "결제 처리 중 문제가 발생했습니다. 다시 시도해 주세요.",
+    "alreadyEnrolled": "이미 수강 중인 강의입니다",
+    "startLearning": "학습 시작하기",
+    "applyCoupon": "쿠폰 적용",
+    "couponPlaceholder": "쿠폰 코드를 입력하세요",
+    "couponApplied": "쿠폰이 적용되었습니다",
+    "couponInvalid": "유효하지 않은 쿠폰입니다",
+    "originalPrice": "정가",
+    "discount": "할인",
+    "finalPrice": "결제 금액"
   }
 }

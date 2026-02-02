@@ -15,3 +15,9 @@ export const paymentStatusEnum = pgEnum("payment_status", [
   "failed",
   "refunded",
 ]);
+
+export const userRoleEnum = pgEnum("user_role", ["user", "admin"]);
+
+export const courseLevelEnum = pgEnum("course_level", ["beginner", "intermediate", "advanced"]);
+
+export const discountTypeEnum = pgEnum("discount_type", ["fixed", "percentage"]);

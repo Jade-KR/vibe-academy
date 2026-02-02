@@ -6,7 +6,7 @@ import { updateSession } from "@/shared/api/supabase/middleware";
 const intlMiddleware = createIntlMiddleware(routing);
 
 // Routes that require authentication
-const PROTECTED_ROUTES = ["/test"];
+const PROTECTED_ROUTES = ["/dashboard", "/learn", "/admin"];
 
 // Routes that should redirect to dashboard if already authenticated
 const AUTH_ROUTES = [
