@@ -7,6 +7,7 @@ import { enrollments } from "@/db/schema/enrollments";
 import { eq, and } from "drizzle-orm";
 import { successResponse, errorResponse } from "@/shared/lib/api";
 import { getDbUser } from "@/shared/lib/api/get-db-user";
+import { getVideoUrl } from "@/shared/api/r2";
 
 type RouteContext = {
   params: Promise<{ courseSlug: string; lessonId: string }>;
@@ -56,13 +57,8 @@ export async function GET(_request: NextRequest, context: RouteContext) {
       if (!enrollment) return errorResponse("FORBIDDEN", "Not enrolled in this course", 403);
     }
 
-    // 5. Generate presigned URL
-    // TODO: R2 presigned URL generation (task-019 handles R2 setup)
-    // For now, return the videoUrl path as a placeholder.
-    // When R2 is set up, replace with:
-    //   import { getPresignedVideoUrl } from "@/shared/api/r2";
-    //   const signedUrl = lesson.videoUrl ? await getPresignedVideoUrl(lesson.videoUrl) : null;
-    const videoUrl = lesson.videoUrl ?? null;
+    // 5. Generate video URL (R2 public domain or presigned)
+    const videoUrl = lesson.videoUrl ? await getVideoUrl(lesson.videoUrl) : null;
 
     return successResponse({
       id: lesson.id,

@@ -61,7 +61,7 @@ export const updateChapterSchema = z.object({
 export const createLessonSchema = z.object({
   title: z.string().min(1).max(200),
   description: z.string().max(2000).optional(),
-  videoUrl: z.string().url().optional(),
+  videoUrl: z.string().min(1).max(500).optional(),
   duration: z.number().int().min(0).optional(),
   isPreview: z.boolean().default(false),
   order: z.number().int().min(0).optional(),
@@ -71,7 +71,7 @@ export const updateLessonSchema = z
   .object({
     title: z.string().min(1).max(200).optional(),
     description: z.string().max(2000).optional().nullable(),
-    videoUrl: z.string().url().optional().nullable(),
+    videoUrl: z.string().min(1).max(500).optional().nullable(),
     duration: z.number().int().min(0).optional().nullable(),
     isPreview: z.boolean().optional(),
   })
@@ -139,4 +139,15 @@ export const adminUserListQuerySchema = z.object({
 
 export const adminAnalyticsQuerySchema = z.object({
   period: z.enum(["7d", "30d", "90d", "all"]).default("30d"),
+});
+
+// --- Admin: Upload URL ---
+
+export const uploadUrlSchema = z.object({
+  objectKey: z
+    .string()
+    .min(1)
+    .max(500)
+    .regex(/^[a-zA-Z0-9\-_/.]+$/, "Object key contains invalid characters"),
+  contentType: z.string().max(100).optional(),
 });

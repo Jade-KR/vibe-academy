@@ -41,4 +41,5 @@ export {
   couponListQuerySchema,
   adminUserListQuerySchema,
   adminAnalyticsQuerySchema,
+  uploadUrlSchema,
 } from "./admin";
