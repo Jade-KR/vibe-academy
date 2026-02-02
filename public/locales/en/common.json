@@ -1,0 +1,320 @@
+{
+  "common": {
+    "loading": "Loading...",
+    "error": "An error occurred",
+    "retry": "Retry",
+    "save": "Save",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "delete": "Delete",
+    "edit": "Edit",
+    "back": "Back",
+    "next": "Next",
+    "notFound": "Page not found",
+    "notFoundDescription": "The page you are looking for does not exist or has been moved.",
+    "errorTitle": "Something went wrong",
+    "errorDescription": "An unexpected error occurred. Please try again.",
+    "goHome": "Go to homepage"
+  },
+  "nav": {
+    "home": "Home",
+    "dashboard": "Dashboard",
+    "settings": "Settings",
+    "pricing": "Pricing",
+    "blog": "Blog",
+    "login": "Login",
+    "register": "Register",
+    "settingsProfile": "Profile",
+    "settingsAccount": "Account",
+    "menu": "Menu"
+  },
+  "auth": {
+    "login": {
+      "title": "Login",
+      "description": "Sign in to your account.",
+      "email": "Email",
+      "password": "Password",
+      "submit": "Sign in",
+      "rememberMe": "Remember me",
+      "forgotPassword": "Forgot password?",
+      "noAccount": "Don't have an account?",
+      "register": "Register"
+    },
+    "register": {
+      "title": "Register",
+      "description": "Create a new account.",
+      "name": "Name",
+      "email": "Email",
+      "password": "Password",
+      "confirmPassword": "Confirm password",
+      "submit": "Sign up",
+      "hasAccount": "Already have an account?",
+      "login": "Login"
+    },
+    "logout": "Logout",
+    "forgotPassword": {
+      "title": "Forgot password",
+      "description": "Enter your email address to receive a reset link.",
+      "email": "Email",
+      "submit": "Send reset link",
+      "sent": "Email sent",
+      "sentDescription": "A password reset link has been sent to your email.",
+      "backToLogin": "Back to login"
+    },
+    "resetPassword": {
+      "title": "Reset password",
+      "description": "Enter your new password.",
+      "password": "New password",
+      "confirmPassword": "Confirm password",
+      "submit": "Change password",
+      "success": "Password changed",
+      "successDescription": "Your password has been successfully changed.",
+      "backToLogin": "Back to login"
+    },
+    "social": {
+      "dividerText": "or",
+      "continueWith": "Continue with {provider}",
+      "google": "Google",
+      "github": "GitHub",
+      "kakao": "Kakao",
+      "naver": "Naver",
+      "apple": "Apple"
+    },
+    "verifyEmail": {
+      "title": "Check your email",
+      "description": "We sent a verification email to your inbox. Click the link in the email to activate your account.",
+      "resend": "Resend email",
+      "resent": "Verification email resent.",
+      "backToLogin": "Back to login"
+    },
+    "unexpectedError": "An unexpected error occurred"
+  },
+  "locale": {
+    "ko": "한국어",
+    "en": "English",
+    "switchLanguage": "Switch language"
+  },
+  "footer": {
+    "copyright": "All rights reserved.",
+    "description": "Your SaaS Boilerplate",
+    "terms": "Terms of Service",
+    "privacy": "Privacy Policy"
+  },
+  "legal": {
+    "terms": {
+      "title": "Terms of Service",
+      "description": "Read the vibePack Terms of Service"
+    },
+    "privacy": {
+      "title": "Privacy Policy",
+      "description": "Read the vibePack Privacy Policy"
+    },
+    "lastModified": "Last modified",
+    "tableOfContents": "Table of Contents"
+  },
+  "theme": {
+    "toggle": "Toggle theme",
+    "light": "Light",
+    "dark": "Dark",
+    "system": "System"
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "description": "Manage your account and view your plan.",
+    "welcome": {
+      "greeting": "Hello, {name}!",
+      "greetingMorning": "Good morning, {name}!",
+      "greetingAfternoon": "Good afternoon, {name}!",
+      "greetingEvening": "Good evening, {name}!",
+      "subtitle": "Here's an overview of your account."
+    },
+    "stats": {
+      "title": "Current Plan",
+      "plan": "Plan",
+      "features": "Features",
+      "apiCalls": "API Calls",
+      "storage": "Storage",
+      "unlimited": "Unlimited",
+      "perMonth": "{count}/month",
+      "mb": "{count} MB"
+    },
+    "actions": {
+      "title": "Quick Actions",
+      "editProfile": "Edit Profile",
+      "accountSettings": "Account Settings",
+      "viewPricing": "View Pricing"
+    }
+  },
+  "settings": {
+    "title": "Settings",
+    "profile": {
+      "title": "Profile",
+      "description": "Manage your profile information",
+      "name": "Display name",
+      "namePlaceholder": "Enter your name",
+      "locale": "Language",
+      "submit": "Save changes",
+      "success": "Profile updated successfully",
+      "unexpectedError": "Failed to update profile"
+    },
+    "avatar": {
+      "title": "Profile picture",
+      "upload": "Upload",
+      "remove": "Remove",
+      "dragDrop": "Drag and drop or click to upload",
+      "maxSize": "Max 5MB. JPG, PNG, or WebP.",
+      "invalidType": "File must be JPG, PNG, or WebP",
+      "tooLarge": "File must be 5MB or less",
+      "success": "Avatar updated successfully",
+      "removed": "Avatar removed",
+      "unexpectedError": "Failed to update avatar"
+    },
+    "password": {
+      "title": "Change password",
+      "description": "Update your account password",
+      "currentPassword": "Current password",
+      "newPassword": "New password",
+      "confirmNewPassword": "Confirm new password",
+      "submit": "Change password",
+      "success": "Password changed successfully",
+      "unexpectedError": "Failed to change password"
+    },
+    "connectedAccounts": {
+      "title": "Connected accounts",
+      "description": "Manage your linked social accounts",
+      "connected": "Connected",
+      "connect": "Connect",
+      "disconnect": "Disconnect",
+      "disconnectError": "Failed to disconnect account",
+      "lastIdentity": "Cannot disconnect your only login method",
+      "unexpectedError": "An unexpected error occurred"
+    }
+  },
+  "landing": {
+    "meta": {
+      "title": "vibePack - Ship Your SaaS Faster",
+      "description": "A production-ready Next.js SaaS boilerplate with auth, payments, email, i18n, and more."
+    },
+    "hero": {
+      "title": "Ship Your SaaS Faster",
+      "subtitle": "A production-ready Next.js boilerplate with authentication, payments, email, i18n, and monitoring built in.",
+      "cta": "Get Started",
+      "secondaryCta": "View Pricing"
+    },
+    "features": {
+      "title": "Everything You Need",
+      "subtitle": "All the essential features for building a modern SaaS product.",
+      "items": {
+        "0": {
+          "title": "Authentication",
+          "description": "Email, social OAuth, magic link, and OTP authentication out of the box."
+        },
+        "1": {
+          "title": "Payments",
+          "description": "Subscription and one-time payments with Polar integration."
+        },
+        "2": {
+          "title": "Email",
+          "description": "Transactional emails with React templates and Resend."
+        },
+        "3": {
+          "title": "Internationalization",
+          "description": "Multi-language support with URL-based routing and next-intl."
+        },
+        "4": {
+          "title": "Database",
+          "description": "PostgreSQL with Drizzle ORM and type-safe schema definitions."
+        },
+        "5": {
+          "title": "Monitoring",
+          "description": "Error tracking and performance monitoring with Sentry."
+        }
+      }
+    },
+    "howItWorks": {
+      "title": "How It Works",
+      "subtitle": "Get your SaaS up and running in three simple steps.",
+      "steps": {
+        "0": {
+          "title": "Clone & Configure",
+          "description": "Clone the repository and set up your environment variables."
+        },
+        "1": {
+          "title": "Customize & Build",
+          "description": "Customize the UI, add your features, and connect your services."
+        },
+        "2": {
+          "title": "Deploy & Launch",
+          "description": "Deploy to Vercel with one click and start acquiring customers."
+        }
+      }
+    },
+    "testimonials": {
+      "title": "What Our Users Say",
+      "subtitle": "Developers love building with vibePack.",
+      "items": {
+        "0": {
+          "name": "Kim Minjun",
+          "role": "Indie Hacker",
+          "quote": "vibePack saved me weeks of setup time. I launched my SaaS in just 3 days."
+        },
+        "1": {
+          "name": "Sarah Chen",
+          "role": "Startup CTO",
+          "quote": "The code quality is excellent. Auth, payments, and i18n just work out of the box."
+        },
+        "2": {
+          "name": "Park Jiwoo",
+          "role": "Full-stack Developer",
+          "quote": "Best SaaS boilerplate I've used. The DX is amazing and the docs are clear."
+        }
+      }
+    },
+    "cta": {
+      "title": "Ready to Ship?",
+      "subtitle": "Start building your SaaS today with vibePack.",
+      "button": "Get Started for Free"
+    }
+  },
+  "blog": {
+    "title": "Blog",
+    "description": "Latest news and technical stories",
+    "readMore": "Read more",
+    "readingTime": "{minutes} min read",
+    "noPosts": "No posts yet",
+    "allPosts": "All Posts",
+    "categories": "Categories",
+    "tags": "Tags",
+    "publishedOn": "Published on",
+    "by": "by",
+    "backToList": "Back to list"
+  },
+  "pricing": {
+    "title": "Pricing",
+    "description": "Choose the plan that fits your project",
+    "monthly": "Monthly",
+    "yearly": "Yearly",
+    "yearlyDiscount": "Save with yearly billing",
+    "perMonth": "/ mo",
+    "perYear": "/ yr",
+    "free": "Free",
+    "currency": "KRW",
+    "getStarted": "Get Started",
+    "subscribe": "Subscribe",
+    "contactUs": "Contact Us",
+    "currentPlan": "Current Plan",
+    "popular": "Popular",
+    "features": "Key Features",
+    "faq": {
+      "title": "Frequently Asked Questions",
+      "q1": "Can I upgrade from the free plan?",
+      "a1": "Yes, you can upgrade anytime from the settings page.",
+      "q2": "Is there a discount for yearly billing?",
+      "a2": "Yes, yearly billing saves you about 17%.",
+      "q3": "What happens if I cancel my subscription?",
+      "a3": "You can continue using the service until the end of your billing period. After that, you'll be switched to the free plan.",
+      "q4": "How do I purchase the Enterprise plan?",
+      "a4": "You can subscribe online or contact our sales team for the Enterprise plan."
+    }
+  }
+}

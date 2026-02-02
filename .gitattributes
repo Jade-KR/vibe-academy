@@ -1,0 +1,8 @@
+# Exclude development/internal files from git archive
+.solo/ export-ignore
+solo-workflow-plugin-en-v3.0.2/ export-ignore
+.claude/settings.local.json export-ignore
+docs/prd.md export-ignore
+docs/SETUP-CLI-PRD.md export-ignore
+docs/UI-AUDIT-PRD.md export-ignore
+docs/web-design-guidelines.json export-ignore

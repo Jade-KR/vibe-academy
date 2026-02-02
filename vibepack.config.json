@@ -1,0 +1,15 @@
+{
+  "generatedAt": "2026-02-02T16:18:24.079Z",
+  "projectName": "vibe-academy",
+  "features": {
+    "auth": [
+      "email-password",
+      "google"
+    ],
+    "payments": true,
+    "locale": "both",
+    "darkMode": true,
+    "email": true,
+    "blog": true
+  }
+}

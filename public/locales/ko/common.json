@@ -1,0 +1,320 @@
+{
+  "common": {
+    "loading": "로딩 중...",
+    "error": "오류가 발생했습니다",
+    "retry": "다시 시도",
+    "save": "저장",
+    "cancel": "취소",
+    "confirm": "확인",
+    "delete": "삭제",
+    "edit": "수정",
+    "back": "뒤로",
+    "next": "다음",
+    "notFound": "페이지를 찾을 수 없습니다",
+    "notFoundDescription": "요청하신 페이지가 존재하지 않거나 이동되었습니다.",
+    "errorTitle": "문제가 발생했습니다",
+    "errorDescription": "예기치 않은 오류가 발생했습니다. 다시 시도해 주세요.",
+    "goHome": "홈으로 돌아가기"
+  },
+  "nav": {
+    "home": "홈",
+    "dashboard": "대시보드",
+    "settings": "설정",
+    "pricing": "요금제",
+    "blog": "블로그",
+    "login": "로그인",
+    "register": "회원가입",
+    "settingsProfile": "프로필",
+    "settingsAccount": "계정",
+    "menu": "메뉴"
+  },
+  "auth": {
+    "login": {
+      "title": "로그인",
+      "description": "계정에 로그인하세요.",
+      "email": "이메일",
+      "password": "비밀번호",
+      "submit": "로그인",
+      "rememberMe": "로그인 상태 유지",
+      "forgotPassword": "비밀번호를 잊으셨나요?",
+      "noAccount": "계정이 없으신가요?",
+      "register": "회원가입"
+    },
+    "register": {
+      "title": "회원가입",
+      "description": "새 계정을 만드세요.",
+      "name": "이름",
+      "email": "이메일",
+      "password": "비밀번호",
+      "confirmPassword": "비밀번호 확인",
+      "submit": "가입하기",
+      "hasAccount": "이미 계정이 있으신가요?",
+      "login": "로그인"
+    },
+    "logout": "로그아웃",
+    "forgotPassword": {
+      "title": "비밀번호 찾기",
+      "description": "가입한 이메일을 입력하세요.",
+      "email": "이메일",
+      "submit": "재설정 링크 보내기",
+      "sent": "이메일 전송 완료",
+      "sentDescription": "비밀번호 재설정 링크가 이메일로 전송되었습니다.",
+      "backToLogin": "로그인으로 돌아가기"
+    },
+    "resetPassword": {
+      "title": "비밀번호 재설정",
+      "description": "새 비밀번호를 입력하세요.",
+      "password": "새 비밀번호",
+      "confirmPassword": "비밀번호 확인",
+      "submit": "비밀번호 변경",
+      "success": "비밀번호 변경 완료",
+      "successDescription": "비밀번호가 성공적으로 변경되었습니다.",
+      "backToLogin": "로그인으로 돌아가기"
+    },
+    "social": {
+      "dividerText": "또는",
+      "continueWith": "{provider}로 계속하기",
+      "google": "Google",
+      "github": "GitHub",
+      "kakao": "카카오",
+      "naver": "네이버",
+      "apple": "Apple"
+    },
+    "verifyEmail": {
+      "title": "이메일을 확인해 주세요",
+      "description": "회원가입 확인 이메일을 보냈습니다. 이메일의 링크를 클릭하여 계정을 활성화해 주세요.",
+      "resend": "이메일 다시 보내기",
+      "resent": "확인 이메일을 다시 보냈습니다.",
+      "backToLogin": "로그인으로 돌아가기"
+    },
+    "unexpectedError": "예기치 않은 오류가 발생했습니다"
+  },
+  "locale": {
+    "ko": "한국어",
+    "en": "English",
+    "switchLanguage": "언어 변경"
+  },
+  "footer": {
+    "copyright": "모든 권리 보유.",
+    "description": "SaaS 보일러플레이트",
+    "terms": "이용약관",
+    "privacy": "개인정보처리방침"
+  },
+  "legal": {
+    "terms": {
+      "title": "이용약관",
+      "description": "vibePack 서비스 이용약관을 확인하세요"
+    },
+    "privacy": {
+      "title": "개인정보처리방침",
+      "description": "vibePack 개인정보처리방침을 확인하세요"
+    },
+    "lastModified": "최종 수정일",
+    "tableOfContents": "목차"
+  },
+  "theme": {
+    "toggle": "테마 변경",
+    "light": "라이트",
+    "dark": "다크",
+    "system": "시스템"
+  },
+  "dashboard": {
+    "title": "대시보드",
+    "description": "계정을 관리하고 플랜을 확인하세요.",
+    "welcome": {
+      "greeting": "안녕하세요, {name}님!",
+      "greetingMorning": "좋은 아침이에요, {name}님!",
+      "greetingAfternoon": "좋은 오후에요, {name}님!",
+      "greetingEvening": "좋은 저녁이에요, {name}님!",
+      "subtitle": "계정 현황을 한눈에 확인하세요."
+    },
+    "stats": {
+      "title": "현재 플랜",
+      "plan": "플랜",
+      "features": "기능",
+      "apiCalls": "API 호출",
+      "storage": "저장 공간",
+      "unlimited": "무제한",
+      "perMonth": "월 {count}회",
+      "mb": "{count} MB"
+    },
+    "actions": {
+      "title": "빠른 작업",
+      "editProfile": "프로필 수정",
+      "accountSettings": "계정 설정",
+      "viewPricing": "요금제 보기"
+    }
+  },
+  "settings": {
+    "title": "설정",
+    "profile": {
+      "title": "프로필",
+      "description": "프로필 정보를 관리하세요",
+      "name": "표시 이름",
+      "namePlaceholder": "이름을 입력하세요",
+      "locale": "언어",
+      "submit": "변경사항 저장",
+      "success": "프로필이 업데이트되었습니다",
+      "unexpectedError": "프로필 업데이트에 실패했습니다"
+    },
+    "avatar": {
+      "title": "프로필 사진",
+      "upload": "업로드",
+      "remove": "삭제",
+      "dragDrop": "드래그 앤 드롭 또는 클릭하여 업로드",
+      "maxSize": "최대 5MB. JPG, PNG 또는 WebP.",
+      "invalidType": "JPG, PNG 또는 WebP 파일만 가능합니다",
+      "tooLarge": "파일 크기는 5MB 이하여야 합니다",
+      "success": "프로필 사진이 업데이트되었습니다",
+      "removed": "프로필 사진이 삭제되었습니다",
+      "unexpectedError": "프로필 사진 업데이트에 실패했습니다"
+    },
+    "password": {
+      "title": "비밀번호 변경",
+      "description": "계정 비밀번호를 업데이트하세요",
+      "currentPassword": "현재 비밀번호",
+      "newPassword": "새 비밀번호",
+      "confirmNewPassword": "새 비밀번호 확인",
+      "submit": "비밀번호 변경",
+      "success": "비밀번호가 변경되었습니다",
+      "unexpectedError": "비밀번호 변경에 실패했습니다"
+    },
+    "connectedAccounts": {
+      "title": "연결된 계정",
+      "description": "연결된 소셜 계정을 관리하세요",
+      "connected": "연결됨",
+      "connect": "연결",
+      "disconnect": "연결 해제",
+      "disconnectError": "계정 연결 해제에 실패했습니다",
+      "lastIdentity": "유일한 로그인 방법은 연결 해제할 수 없습니다",
+      "unexpectedError": "예기치 않은 오류가 발생했습니다"
+    }
+  },
+  "landing": {
+    "meta": {
+      "title": "vibePack - SaaS를 더 빠르게 출시하세요",
+      "description": "인증, 결제, 이메일, 다국어, 모니터링이 내장된 프로덕션 레디 Next.js SaaS 보일러플레이트."
+    },
+    "hero": {
+      "title": "SaaS를 더 빠르게 출시하세요",
+      "subtitle": "인증, 결제, 이메일, 다국어, 모니터링이 내장된 프로덕션 레디 Next.js 보일러플레이트.",
+      "cta": "시작하기",
+      "secondaryCta": "요금제 보기"
+    },
+    "features": {
+      "title": "필요한 모든 것",
+      "subtitle": "현대적인 SaaS 제품을 구축하는 데 필요한 모든 기능을 제공합니다.",
+      "items": {
+        "0": {
+          "title": "인증",
+          "description": "이메일, 소셜 OAuth, 매직 링크, OTP 인증을 기본 제공합니다."
+        },
+        "1": {
+          "title": "결제",
+          "description": "Polar 연동으로 구독 및 일회성 결제를 지원합니다."
+        },
+        "2": {
+          "title": "이메일",
+          "description": "React 템플릿과 Resend로 트랜잭션 이메일을 발송합니다."
+        },
+        "3": {
+          "title": "다국어 지원",
+          "description": "URL 기반 라우팅과 next-intl로 다국어를 지원합니다."
+        },
+        "4": {
+          "title": "데이터베이스",
+          "description": "PostgreSQL과 Drizzle ORM으로 타입 안전한 스키마를 정의합니다."
+        },
+        "5": {
+          "title": "모니터링",
+          "description": "Sentry로 에러 추적과 성능 모니터링을 제공합니다."
+        }
+      }
+    },
+    "howItWorks": {
+      "title": "시작하는 방법",
+      "subtitle": "3단계로 SaaS를 시작하세요.",
+      "steps": {
+        "0": {
+          "title": "클론 및 설정",
+          "description": "저장소를 클론하고 환경 변수를 설정하세요."
+        },
+        "1": {
+          "title": "커스터마이즈 및 개발",
+          "description": "UI를 커스터마이즈하고 기능을 추가하고 서비스를 연결하세요."
+        },
+        "2": {
+          "title": "배포 및 출시",
+          "description": "Vercel에 원클릭 배포하고 고객을 확보하세요."
+        }
+      }
+    },
+    "testimonials": {
+      "title": "사용자 후기",
+      "subtitle": "개발자들이 vibePack으로 개발하는 것을 좋아합니다.",
+      "items": {
+        "0": {
+          "name": "김민준",
+          "role": "인디 해커",
+          "quote": "vibePack 덕분에 설정 시간을 몇 주나 절약했습니다. 단 3일 만에 SaaS를 출시했어요."
+        },
+        "1": {
+          "name": "Sarah Chen",
+          "role": "스타트업 CTO",
+          "quote": "코드 품질이 뛰어납니다. 인증, 결제, 다국어가 바로 작동합니다."
+        },
+        "2": {
+          "name": "박지우",
+          "role": "풀스택 개발자",
+          "quote": "제가 사용한 최고의 SaaS 보일러플레이트입니다. DX가 놀랍고 문서도 명확합니다."
+        }
+      }
+    },
+    "cta": {
+      "title": "시작할 준비가 되셨나요?",
+      "subtitle": "vibePack으로 오늘 SaaS 개발을 시작하세요.",
+      "button": "무료로 시작하기"
+    }
+  },
+  "blog": {
+    "title": "블로그",
+    "description": "최신 소식과 기술 이야기를 만나보세요",
+    "readMore": "자세히 보기",
+    "readingTime": "{minutes}분 소요",
+    "noPosts": "아직 게시물이 없습니다",
+    "allPosts": "전체 글",
+    "categories": "카테고리",
+    "tags": "태그",
+    "publishedOn": "작성일",
+    "by": "작성자",
+    "backToList": "목록으로"
+  },
+  "pricing": {
+    "title": "요금제",
+    "description": "프로젝트에 맞는 플랜을 선택하세요",
+    "monthly": "월간",
+    "yearly": "연간",
+    "yearlyDiscount": "연간 결제 시 할인",
+    "perMonth": "/ 월",
+    "perYear": "/ 년",
+    "free": "무료",
+    "currency": "원",
+    "getStarted": "시작하기",
+    "subscribe": "구독하기",
+    "contactUs": "문의하기",
+    "currentPlan": "현재 플랜",
+    "popular": "인기",
+    "features": "주요 기능",
+    "faq": {
+      "title": "자주 묻는 질문",
+      "q1": "무료 플랜에서 유료 플랜으로 전환할 수 있나요?",
+      "a1": "네, 언제든지 업그레이드할 수 있습니다. 설정 페이지에서 플랜을 변경하세요.",
+      "q2": "연간 결제 시 할인이 있나요?",
+      "a2": "네, 연간 결제 시 약 17% 할인됩니다.",
+      "q3": "구독을 취소하면 어떻게 되나요?",
+      "a3": "구독 기간이 끝날 때까지 서비스를 이용할 수 있습니다. 이후 무료 플랜으로 전환됩니다.",
+      "q4": "Enterprise 플랜은 어떻게 구매하나요?",
+      "a4": "Enterprise 플랜은 온라인으로 구독하거나 영업팀에 문의할 수 있습니다."
+    }
+  }
+}
