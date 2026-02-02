@@ -115,6 +115,10 @@
       "title": "개인정보처리방침",
       "description": "vibePack 개인정보처리방침을 확인하세요"
     },
+    "refund": {
+      "title": "환불정책",
+      "description": "강의 환불 정책을 확인하세요"
+    },
     "lastModified": "최종 수정일",
     "tableOfContents": "목차"
   },
