@@ -28,3 +28,16 @@ export {
   updateReviewSchema,
   discussionListQuerySchema,
 } from "./lecture";
+
+export {
+  createCourseSchema,
+  updateCourseSchema,
+  createChapterSchema,
+  updateChapterSchema,
+  createLessonSchema,
+  updateLessonSchema,
+  reorderSchema,
+  createCouponSchema,
+  adminUserListQuerySchema,
+  adminAnalyticsQuerySchema,
+} from "./admin";
