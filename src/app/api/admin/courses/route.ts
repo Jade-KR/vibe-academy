@@ -8,7 +8,13 @@ import { requireAdmin } from "@/shared/lib/api/admin-guard";
 
 export async function POST(request: NextRequest) {
   try {
-    const body: unknown = await request.json();
+    let body: unknown;
+    try {
+      body = await request.json();
+    } catch {
+      return errorResponse("BAD_REQUEST", "Invalid JSON body", 400);
+    }
+
     const parsed = createCourseSchema.safeParse(body);
     if (!parsed.success) return zodErrorResponse(parsed.error);
 

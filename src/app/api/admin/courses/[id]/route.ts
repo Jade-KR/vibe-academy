@@ -4,7 +4,7 @@ import { courses } from "@/db/schema/courses";
 import { eq, and, ne } from "drizzle-orm";
 import { updateCourseSchema } from "@/shared/lib/validations";
 import { successResponse, errorResponse, zodErrorResponse } from "@/shared/lib/api";
-import { requireAdmin } from "@/shared/lib/api/admin-guard";
+import { requireAdmin, parseUuid } from "@/shared/lib/api/admin-guard";
 
 type RouteContext = {
   params: Promise<{ id: string }>;
@@ -13,7 +13,16 @@ type RouteContext = {
 export async function PATCH(request: NextRequest, context: RouteContext) {
   try {
     const { id } = await context.params;
-    const body: unknown = await request.json();
+    const validId = parseUuid(id);
+    if (!validId) return errorResponse("BAD_REQUEST", "Invalid ID format", 400);
+
+    let body: unknown;
+    try {
+      body = await request.json();
+    } catch {
+      return errorResponse("BAD_REQUEST", "Invalid JSON body", 400);
+    }
+
     const parsed = updateCourseSchema.safeParse(body);
     if (!parsed.success) return zodErrorResponse(parsed.error);
 
@@ -25,7 +34,7 @@ export async function PATCH(request: NextRequest, context: RouteContext) {
       const [existing] = await db
         .select({ id: courses.id })
         .from(courses)
-        .where(and(eq(courses.slug, parsed.data.slug), ne(courses.id, id)))
+        .where(and(eq(courses.slug, parsed.data.slug), ne(courses.id, validId)))
         .limit(1);
       if (existing) {
         return errorResponse("CONFLICT", "A course with this slug already exists", 409);
@@ -35,7 +44,7 @@ export async function PATCH(request: NextRequest, context: RouteContext) {
     const [updated] = await db
       .update(courses)
       .set({ ...parsed.data, updatedAt: new Date() })
-      .where(eq(courses.id, id))
+      .where(eq(courses.id, validId))
       .returning({
         id: courses.id,
         title: courses.title,
@@ -56,13 +65,15 @@ export async function PATCH(request: NextRequest, context: RouteContext) {
 export async function DELETE(_request: NextRequest, context: RouteContext) {
   try {
     const { id } = await context.params;
+    const validId = parseUuid(id);
+    if (!validId) return errorResponse("BAD_REQUEST", "Invalid ID format", 400);
 
     const { dbUser, response } = await requireAdmin();
     if (!dbUser) return response;
 
     const [deleted] = await db
       .delete(courses)
-      .where(eq(courses.id, id))
+      .where(eq(courses.id, validId))
       .returning({ id: courses.id });
 
     if (!deleted) return errorResponse("NOT_FOUND", "Course not found", 404);

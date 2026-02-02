@@ -52,13 +52,9 @@ export const createChapterSchema = z.object({
   order: z.number().int().min(0).optional(),
 });
 
-export const updateChapterSchema = z
-  .object({
-    title: z.string().min(1).max(200).optional(),
-  })
-  .refine((data) => data.title !== undefined, {
-    message: "At least one field must be provided",
-  });
+export const updateChapterSchema = z.object({
+  title: z.string().min(1).max(200),
+});
 
 // --- Admin: Lessons ---
 
@@ -124,6 +120,11 @@ export const createCouponSchema = z
     },
     { message: "Percentage discount cannot exceed 100" },
   );
+
+export const couponListQuerySchema = z.object({
+  page: z.coerce.number().int().min(1).default(1),
+  pageSize: z.coerce.number().int().min(1).max(100).default(20),
+});
 
 // --- Admin: Users Query ---
 

@@ -4,7 +4,7 @@ import { lessons } from "@/db/schema/lessons";
 import { eq } from "drizzle-orm";
 import { updateLessonSchema } from "@/shared/lib/validations";
 import { successResponse, errorResponse, zodErrorResponse } from "@/shared/lib/api";
-import { requireAdmin } from "@/shared/lib/api/admin-guard";
+import { requireAdmin, parseUuid } from "@/shared/lib/api/admin-guard";
 
 type RouteContext = {
   params: Promise<{ id: string }>;
@@ -13,7 +13,16 @@ type RouteContext = {
 export async function PATCH(request: NextRequest, context: RouteContext) {
   try {
     const { id } = await context.params;
-    const body: unknown = await request.json();
+    const validId = parseUuid(id);
+    if (!validId) return errorResponse("BAD_REQUEST", "Invalid ID format", 400);
+
+    let body: unknown;
+    try {
+      body = await request.json();
+    } catch {
+      return errorResponse("BAD_REQUEST", "Invalid JSON body", 400);
+    }
+
     const parsed = updateLessonSchema.safeParse(body);
     if (!parsed.success) return zodErrorResponse(parsed.error);
 
@@ -23,7 +32,7 @@ export async function PATCH(request: NextRequest, context: RouteContext) {
     const [updated] = await db
       .update(lessons)
       .set(parsed.data)
-      .where(eq(lessons.id, id))
+      .where(eq(lessons.id, validId))
       .returning({
         id: lessons.id,
         title: lessons.title,
@@ -46,13 +55,15 @@ export async function PATCH(request: NextRequest, context: RouteContext) {
 export async function DELETE(_request: NextRequest, context: RouteContext) {
   try {
     const { id } = await context.params;
+    const validId = parseUuid(id);
+    if (!validId) return errorResponse("BAD_REQUEST", "Invalid ID format", 400);
 
     const { dbUser, response } = await requireAdmin();
     if (!dbUser) return response;
 
     const [deleted] = await db
       .delete(lessons)
-      .where(eq(lessons.id, id))
+      .where(eq(lessons.id, validId))
       .returning({ id: lessons.id });
 
     if (!deleted) return errorResponse("NOT_FOUND", "Lesson not found", 404);

@@ -3,13 +3,19 @@ import { db } from "@/db/client";
 import { coupons } from "@/db/schema/coupons";
 import { courses } from "@/db/schema/courses";
 import { eq, desc, sql } from "drizzle-orm";
-import { createCouponSchema } from "@/shared/lib/validations";
+import { createCouponSchema, couponListQuerySchema } from "@/shared/lib/validations";
 import { successResponse, errorResponse, zodErrorResponse } from "@/shared/lib/api";
 import { requireAdmin } from "@/shared/lib/api/admin-guard";
 
 export async function POST(request: NextRequest) {
   try {
-    const body: unknown = await request.json();
+    let body: unknown;
+    try {
+      body = await request.json();
+    } catch {
+      return errorResponse("BAD_REQUEST", "Invalid JSON body", 400);
+    }
+
     const parsed = createCouponSchema.safeParse(body);
     if (!parsed.success) return zodErrorResponse(parsed.error);
 
@@ -64,10 +70,19 @@ export async function POST(request: NextRequest) {
   }
 }
 
-export async function GET(_request: NextRequest) {
+export async function GET(request: NextRequest) {
   try {
     const { dbUser, response } = await requireAdmin();
     if (!dbUser) return response;
+
+    const searchParams = Object.fromEntries(request.nextUrl.searchParams);
+    const queryParsed = couponListQuerySchema.safeParse(searchParams);
+    if (!queryParsed.success) return zodErrorResponse(queryParsed.error);
+
+    const { page, pageSize } = queryParsed.data;
+    const offset = (page - 1) * pageSize;
+
+    const [{ total }] = await db.select({ total: sql<number>`count(*)::int` }).from(coupons);
 
     const items = await db
       .select({
@@ -84,9 +99,17 @@ export async function GET(_request: NextRequest) {
       })
       .from(coupons)
       .leftJoin(courses, eq(coupons.courseId, courses.id))
-      .orderBy(desc(coupons.createdAt));
+      .orderBy(desc(coupons.createdAt))
+      .limit(pageSize)
+      .offset(offset);
 
-    return successResponse(items);
+    return successResponse({
+      items,
+      total,
+      page,
+      pageSize,
+      hasMore: offset + items.length < total,
+    });
   } catch (error) {
     console.error("[GET /api/admin/coupons]", error);
     return errorResponse("INTERNAL_ERROR", "An unexpected error occurred", 500);

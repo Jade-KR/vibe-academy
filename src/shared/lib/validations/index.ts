@@ -38,6 +38,7 @@ export {
   updateLessonSchema,
   reorderSchema,
   createCouponSchema,
+  couponListQuerySchema,
   adminUserListQuerySchema,
   adminAnalyticsQuerySchema,
 } from "./admin";
