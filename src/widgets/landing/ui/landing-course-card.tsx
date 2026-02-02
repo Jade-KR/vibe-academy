@@ -57,7 +57,7 @@ export function LandingCourseCard({ course }: LandingCourseCardProps) {
           {course.reviewCount > 0 && (
             <div className="mt-2 flex items-center gap-1 text-xs text-muted-foreground">
               <Star className="h-3.5 w-3.5 fill-yellow-400 text-yellow-400" aria-hidden="true" />
-              <span>{course.averageRating}</span>
+              <span>{course.averageRating.toFixed(1)}</span>
               <span>({t("reviewCount", { count: course.reviewCount })})</span>
             </div>
           )}

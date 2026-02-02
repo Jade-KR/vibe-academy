@@ -1,5 +1,6 @@
 "use client";
 
+import { useMemo } from "react";
 import useSWR from "swr";
 import type { CourseSummaryWithStats } from "../model/types";
 import { FEATURED_COURSES_COUNT, LANDING_CATEGORIES } from "../config";
@@ -11,21 +12,31 @@ import { FEATURED_COURSES_COUNT, LANDING_CATEGORIES } from "../config";
 export function useLandingCourses() {
   const { data, error, isLoading } = useSWR("/api/courses");
 
-  const allCourses: CourseSummaryWithStats[] = (data?.data as CourseSummaryWithStats[]) ?? [];
+  const allCourses: CourseSummaryWithStats[] = useMemo(
+    () => (data?.data as CourseSummaryWithStats[]) ?? [],
+    [data],
+  );
 
   // Featured: top N courses by averageRating (descending), then by reviewCount
-  const featuredCourses = [...allCourses]
-    .sort((a, b) => b.averageRating - a.averageRating || b.reviewCount - a.reviewCount)
-    .slice(0, FEATURED_COURSES_COUNT);
+  const featuredCourses = useMemo(
+    () =>
+      [...allCourses]
+        .sort((a, b) => b.averageRating - a.averageRating || b.reviewCount - a.reviewCount)
+        .slice(0, FEATURED_COURSES_COUNT),
+    [allCourses],
+  );
 
   // Group by category for the category sections
-  const coursesByCategory = new Map<string, CourseSummaryWithStats[]>();
-  for (const cat of LANDING_CATEGORIES) {
-    const courses = allCourses.filter((c) => c.category === cat.key);
-    if (courses.length > 0) {
-      coursesByCategory.set(cat.key, courses);
+  const coursesByCategory = useMemo(() => {
+    const map = new Map<string, CourseSummaryWithStats[]>();
+    for (const cat of LANDING_CATEGORIES) {
+      const courses = allCourses.filter((c) => c.category === cat.key);
+      if (courses.length > 0) {
+        map.set(cat.key, courses);
+      }
     }
-  }
+    return map;
+  }, [allCourses]);
 
   return {
     allCourses,

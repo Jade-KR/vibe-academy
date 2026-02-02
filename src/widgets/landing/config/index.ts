@@ -8,8 +8,8 @@ export const REVIEW_HIGHLIGHTS_COUNT = 6;
 
 /** Categories to display on the landing page, in order */
 export const LANDING_CATEGORIES: LandingCategory[] = [
-  { key: "frontend-basic", labelKey: "landing.categories.frontendBasic" },
-  { key: "frontend-advanced", labelKey: "landing.categories.frontendAdvanced" },
-  { key: "backend", labelKey: "landing.categories.backend" },
-  { key: "developer-essentials", labelKey: "landing.categories.developerEssentials" },
+  { key: "frontend-basic", labelKey: "categories.frontendBasic" },
+  { key: "frontend-advanced", labelKey: "categories.frontendAdvanced" },
+  { key: "backend", labelKey: "categories.backend" },
+  { key: "developer-essentials", labelKey: "categories.developerEssentials" },
 ];

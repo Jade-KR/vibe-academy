@@ -10,24 +10,39 @@ import { useGlobalReviews } from "@/entities/review";
 import { REVIEW_HIGHLIGHTS_COUNT } from "../config";
 
 export function LandingContent() {
-  const { featuredCourses, coursesByCategory, isLoading: coursesLoading } = useLandingCourses();
+  const {
+    featuredCourses,
+    coursesByCategory,
+    error: coursesError,
+    isLoading: coursesLoading,
+  } = useLandingCourses();
   const {
     reviews,
     hasMore: reviewsHasMore,
+    error: reviewsError,
     isLoading: reviewsLoading,
   } = useGlobalReviews(REVIEW_HIGHLIGHTS_COUNT);
+
+  const showCourses = coursesLoading || (!coursesError && featuredCourses.length > 0);
+  const showReviews = reviewsLoading || (!reviewsError && reviews.length > 0);
 
   return (
     <>
       <HeroSection />
-      <FeaturedCoursesCarousel courses={featuredCourses} isLoading={coursesLoading} />
+      {showCourses && (
+        <FeaturedCoursesCarousel courses={featuredCourses} isLoading={coursesLoading} />
+      )}
       <ValuePropositionSection />
-      <CategoryCoursesSection coursesByCategory={coursesByCategory} isLoading={coursesLoading} />
-      <ReviewHighlightsSection
-        reviews={reviews}
-        isLoading={reviewsLoading}
-        hasMore={reviewsHasMore}
-      />
+      {showCourses && (
+        <CategoryCoursesSection coursesByCategory={coursesByCategory} isLoading={coursesLoading} />
+      )}
+      {showReviews && (
+        <ReviewHighlightsSection
+          reviews={reviews}
+          isLoading={reviewsLoading}
+          hasMore={reviewsHasMore}
+        />
+      )}
     </>
   );
 }
