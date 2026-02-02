@@ -115,6 +115,10 @@
       "title": "Privacy Policy",
       "description": "Read the vibePack Privacy Policy"
     },
+    "refund": {
+      "title": "Refund Policy",
+      "description": "Read the course refund policy"
+    },
     "lastModified": "Last modified",
     "tableOfContents": "Table of Contents"
   },
