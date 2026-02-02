@@ -31,10 +31,12 @@ describe("Landing Page", () => {
 
   it("generateMetadata returns correct title and description", async () => {
     const { generateMetadata } = await import("@/app/[locale]/(marketing)/page");
-    const metadata = await generateMetadata();
+    const metadata = await generateMetadata({
+      params: Promise.resolve({ locale: "ko" }),
+    });
     expect(metadata).toEqual({
-      title: "title",
-      description: "description",
+      title: "meta.title",
+      description: "meta.description",
     });
   });
 });

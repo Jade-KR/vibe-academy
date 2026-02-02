@@ -206,88 +206,51 @@
   },
   "landing": {
     "meta": {
-      "title": "vibePack - Ship Your SaaS Faster",
-      "description": "A production-ready Next.js SaaS boilerplate with auth, payments, email, i18n, and more."
+      "title": "vibeAcademy - Code Your Dream",
+      "description": "A hands-on coding course platform. Learn frontend, backend, and developer essentials."
     },
     "hero": {
-      "title": "Ship Your SaaS Faster",
-      "subtitle": "A production-ready Next.js boilerplate with authentication, payments, email, i18n, and monitoring built in.",
-      "cta": "Get Started",
-      "secondaryCta": "View Pricing"
+      "title": "Code Your Dream",
+      "subtitle": "Not just memorizing syntax -- build real skills with coding courses. Learn systematically from basics to advanced.",
+      "cta": "Browse Courses",
+      "secondaryCta": "Read Reviews",
+      "imageAlt": "Coding education illustration"
     },
-    "features": {
-      "title": "Everything You Need",
-      "subtitle": "All the essential features for building a modern SaaS product.",
+    "featuredCourses": {
+      "title": "Featured Courses",
+      "subtitle": "Discover our most popular and highly-rated courses.",
+      "prev": "Previous",
+      "next": "Next",
+      "slide": "Slide"
+    },
+    "valueProp": {
+      "title": "Why vibeAcademy?",
+      "subtitle": "We offer a systematic curriculum focused on real-world projects.",
       "items": {
         "0": {
-          "title": "Authentication",
-          "description": "Email, social OAuth, magic link, and OTP authentication out of the box."
+          "title": "Solid Teaching Philosophy",
+          "description": "We help you grow into a developer who understands principles and solves problems independently, not just copy-pasting code."
         },
         "1": {
-          "title": "Payments",
-          "description": "Subscription and one-time payments with Polar integration."
+          "title": "Analytical Thinking",
+          "description": "Train your thought process: analyze requirements, design optimal solutions, and write efficient code."
         },
         "2": {
-          "title": "Email",
-          "description": "Transactional emails with React templates and Resend."
-        },
-        "3": {
-          "title": "Internationalization",
-          "description": "Multi-language support with URL-based routing and next-intl."
-        },
-        "4": {
-          "title": "Database",
-          "description": "PostgreSQL with Drizzle ORM and type-safe schema definitions."
-        },
-        "5": {
-          "title": "Monitoring",
-          "description": "Error tracking and performance monitoring with Sentry."
+          "title": "Real-World Experience",
+          "description": "Tackle real problems through projects. Go beyond theory and practice to gain production-level experience."
         }
       }
     },
-    "howItWorks": {
-      "title": "How It Works",
-      "subtitle": "Get your SaaS up and running in three simple steps.",
-      "steps": {
-        "0": {
-          "title": "Clone & Configure",
-          "description": "Clone the repository and set up your environment variables."
-        },
-        "1": {
-          "title": "Customize & Build",
-          "description": "Customize the UI, add your features, and connect your services."
-        },
-        "2": {
-          "title": "Deploy & Launch",
-          "description": "Deploy to Vercel with one click and start acquiring customers."
-        }
-      }
+    "categories": {
+      "frontendBasic": "Frontend Basics",
+      "frontendAdvanced": "Frontend Advanced",
+      "backend": "Backend",
+      "developerEssentials": "Developer Essentials"
     },
-    "testimonials": {
-      "title": "What Our Users Say",
-      "subtitle": "Developers love building with vibePack.",
-      "items": {
-        "0": {
-          "name": "Kim Minjun",
-          "role": "Indie Hacker",
-          "quote": "vibePack saved me weeks of setup time. I launched my SaaS in just 3 days."
-        },
-        "1": {
-          "name": "Sarah Chen",
-          "role": "Startup CTO",
-          "quote": "The code quality is excellent. Auth, payments, and i18n just work out of the box."
-        },
-        "2": {
-          "name": "Park Jiwoo",
-          "role": "Full-stack Developer",
-          "quote": "Best SaaS boilerplate I've used. The DX is amazing and the docs are clear."
-        }
-      }
-    },
-    "cta": {
-      "title": "Ready to Ship?",
-      "subtitle": "Start building your SaaS today with vibePack.",
-      "button": "Get Started for Free"
+    "reviewHighlights": {
+      "title": "Student Reviews",
+      "moreLink": "See more reviews",
+      "anonymous": "Anonymous"
     }
   },
   "blog": {
