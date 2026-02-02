@@ -334,6 +334,12 @@
     "relatedCourses": "Related Courses",
     "empty": "No courses available",
     "emptyDescription": "New courses are coming soon.",
+    "categories": {
+      "frontendBasic": "Frontend Basics",
+      "frontendAdvanced": "Frontend Advanced",
+      "backend": "Backend",
+      "developerEssentials": "Developer Essentials"
+    },
     "detail": {
       "hero": {
         "enrollCta": "Enroll Now",

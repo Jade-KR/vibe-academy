@@ -34,6 +34,25 @@ export interface CourseDetail extends Course {
 }
 
 /**
+ * Course summary with computed review stats.
+ * Matches the shape returned by GET /api/courses (includes reviewCount
+ * and averageRating via SQL subquery, beyond what CourseSummary defines).
+ */
+export interface CourseSummaryWithStats {
+  id: string;
+  title: string;
+  slug: string;
+  description: string | null;
+  price: number;
+  level: CourseLevel;
+  category: string | null;
+  thumbnailUrl: string | null;
+  isFree: boolean;
+  reviewCount: number;
+  averageRating: number;
+}
+
+/**
  * Query params for listing courses.
  */
 export interface CourseListParams {
