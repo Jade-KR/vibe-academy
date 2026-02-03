@@ -5,6 +5,7 @@ import { useTranslations } from "next-intl";
 import { useRouter } from "@/i18n/navigation";
 import { toast } from "sonner";
 import { PanelLeftClose, PanelLeftOpen, PanelRightClose, PanelRightOpen } from "lucide-react";
+import { cn } from "@/shared/lib/cn";
 import { Button, Skeleton } from "@/shared/ui";
 import { useCurriculum } from "@/entities/progress";
 import type { CurriculumChapter } from "@/entities/progress";
@@ -102,9 +103,9 @@ export function LearnLayout({ courseSlug, lessonId }: LearnLayoutProps) {
     return (
       <div className="flex h-screen items-center justify-center bg-background">
         <div className="text-center space-y-4">
-          <p className="text-lg font-medium text-foreground">{t("notEnrolled")}</p>
+          <p className="text-lg font-medium text-foreground">{t("errorLoadingCourse")}</p>
           <Button onClick={() => window.location.reload()} variant="outline">
-            Retry
+            {t("retry")}
           </Button>
         </div>
       </div>
@@ -120,7 +121,8 @@ export function LearnLayout({ courseSlug, lessonId }: LearnLayoutProps) {
           size="icon"
           className="h-8 w-8"
           onClick={toggleLeft}
-          aria-label={leftOpen ? t("sidebar.curriculum") : t("sidebar.curriculum")}
+          aria-label={leftOpen ? t("hideCurriculum") : t("showCurriculum")}
+          aria-expanded={leftOpen}
         >
           {leftOpen ? (
             <PanelLeftClose className="h-4 w-4" />
@@ -131,16 +133,17 @@ export function LearnLayout({ courseSlug, lessonId }: LearnLayoutProps) {
       </div>
 
       {/* Left panel: Curriculum sidebar (desktop) */}
-      {leftOpen && (
-        <CurriculumSidebar
-          courseSlug={courseSlug}
-          course={course}
-          chapters={chapters}
-          progress={progress}
-          currentLessonId={lessonId}
-          className="hidden lg:flex w-[240px] shrink-0 transition-all duration-200"
-        />
-      )}
+      <CurriculumSidebar
+        courseSlug={courseSlug}
+        course={course}
+        chapters={chapters}
+        progress={progress}
+        currentLessonId={lessonId}
+        className={cn(
+          "hidden lg:flex shrink-0 transition-all duration-200",
+          leftOpen ? "w-[240px]" : "w-0 overflow-hidden",
+        )}
+      />
 
       {/* Center: Lesson content */}
       <div className="flex-1 min-w-0 overflow-y-auto pb-16 lg:pb-0">
@@ -154,11 +157,14 @@ export function LearnLayout({ courseSlug, lessonId }: LearnLayoutProps) {
       </div>
 
       {/* Right panel: Discussion (desktop) */}
-      {rightOpen && (
-        <aside className="hidden lg:flex w-[320px] shrink-0 flex-col border-l bg-background overflow-y-auto p-4 transition-all duration-200">
-          <DiscussionPanel lessonId={lessonId} />
-        </aside>
-      )}
+      <aside
+        className={cn(
+          "hidden lg:flex shrink-0 flex-col border-l bg-background overflow-y-auto p-4 transition-all duration-200",
+          rightOpen ? "w-[320px]" : "w-0 overflow-hidden border-l-0 p-0",
+        )}
+      >
+        <DiscussionPanel lessonId={lessonId} />
+      </aside>
 
       {/* Right panel toggle (desktop only) */}
       <div className="hidden lg:flex items-start pt-3 shrink-0">
@@ -167,7 +173,8 @@ export function LearnLayout({ courseSlug, lessonId }: LearnLayoutProps) {
           size="icon"
           className="h-8 w-8"
           onClick={toggleRight}
-          aria-label={t("sidebar.discussion")}
+          aria-label={rightOpen ? t("hideDiscussion") : t("showDiscussion")}
+          aria-expanded={rightOpen}
         >
           {rightOpen ? (
             <PanelRightClose className="h-4 w-4" />

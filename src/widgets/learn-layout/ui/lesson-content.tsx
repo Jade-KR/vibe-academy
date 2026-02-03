@@ -74,9 +74,13 @@ export function LessonContent({
 
   // --- "Complete & Next" handler ---
   const handleCompleteAndNext = useCallback(async () => {
-    await manualComplete();
-    if (nextLesson) {
-      router.push(`/learn/${courseSlug}/${nextLesson.lessonId}`);
+    try {
+      await manualComplete();
+      if (nextLesson) {
+        router.push(`/learn/${courseSlug}/${nextLesson.lessonId}`);
+      }
+    } catch {
+      // manualComplete handles its own error reporting; navigation is simply skipped on failure
     }
   }, [manualComplete, nextLesson, courseSlug, router]);
 
@@ -99,9 +103,9 @@ export function LessonContent({
   if (error) {
     return (
       <div className="flex flex-col items-center justify-center py-20 text-center">
-        <p className="text-lg font-medium text-foreground">Could not load lesson</p>
+        <p className="text-lg font-medium text-foreground">{t("errorLoadingLesson")}</p>
         <Button onClick={() => window.location.reload()} variant="outline" className="mt-4">
-          Retry
+          {t("retry")}
         </Button>
       </div>
     );
