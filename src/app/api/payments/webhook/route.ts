@@ -4,10 +4,13 @@ import { db } from "@/db/client";
 import { subscriptions } from "@/db/schema/subscriptions";
 import { payments } from "@/db/schema/payments";
 import { users } from "@/db/schema/users";
+import { enrollments } from "@/db/schema/enrollments";
+import { courses } from "@/db/schema/courses";
 import { eq } from "drizzle-orm";
 import { errorResponse } from "@/shared/lib/api";
 import { sendEmail } from "@/shared/api/resend";
 import { SubscriptionEmail } from "@/shared/api/resend/templates/subscription";
+import { CourseEnrollmentEmail } from "@/shared/api/resend/templates/course-enrollment";
 import { siteConfig } from "@/shared/config/site";
 
 // No auth -- webhooks are verified by signature only
@@ -69,6 +72,9 @@ async function handleWebhookEvent(event: { type: string; data: Record<string, un
     case "order.created":
       await handleOrderCreated(event.data);
       break;
+    case "order.refunded":
+      await handleOrderRefunded(event.data);
+      break;
     default:
       console.log(`[Webhook] Unhandled event type: ${event.type}`);
   }
@@ -81,13 +87,17 @@ async function handleCheckoutCreated(data: Record<string, unknown>) {
   const userId = metadata?.userId;
   if (!userId) return;
 
+  const isCourse = metadata?.type === "course_purchase";
+
   await db.insert(payments).values({
     userId,
     polarPaymentId: data.id as string,
     amount: (data.amount as number) ?? 0,
     currency: (data.currency as string) ?? "KRW",
     status: "pending",
-    description: `Checkout for ${metadata?.planId ?? "unknown"} plan`,
+    description: isCourse
+      ? `Course purchase: ${metadata?.courseSlug ?? "unknown"}`
+      : `Checkout for ${metadata?.planId ?? "unknown"} plan`,
     metadata: JSON.stringify(data),
   });
 }
@@ -96,9 +106,16 @@ async function handleCheckoutUpdated(data: Record<string, unknown>) {
   const polarPaymentId = data.id as string;
   if (!polarPaymentId) return;
 
-  const status = data.status === "succeeded" ? "completed" : "pending";
+  const metadata = data.metadata as Record<string, string> | undefined;
+  const status = mapCheckoutStatus(data.status);
 
+  // Update payment status (works for both subscription and course)
   await db.update(payments).set({ status }).where(eq(payments.polarPaymentId, polarPaymentId));
+
+  // Course purchase: create enrollment on success
+  if (metadata?.type === "course_purchase" && status === "completed") {
+    await handleCourseEnrollment(metadata, polarPaymentId, data);
+  }
 }
 
 async function handleSubscriptionCreated(data: Record<string, unknown>) {
@@ -209,15 +226,112 @@ async function handleOrderCreated(data: Record<string, unknown>) {
   const userId = metadata?.userId;
   if (!userId) return;
 
+  const isCourse = metadata?.type === "course_purchase";
+  const polarPaymentId = data.id as string;
+
   await db.insert(payments).values({
     userId,
-    polarPaymentId: data.id as string,
+    polarPaymentId,
     amount: (data.amount as number) ?? 0,
     currency: (data.currency as string) ?? "KRW",
     status: "completed",
-    description: `Order for ${metadata?.planId ?? "unknown"} plan`,
+    description: isCourse
+      ? `Course purchase: ${metadata?.courseSlug ?? "unknown"}`
+      : `Order for ${metadata?.planId ?? "unknown"} plan`,
     metadata: JSON.stringify(data),
   });
+
+  // Course purchase: create enrollment
+  if (isCourse) {
+    await handleCourseEnrollment(metadata, polarPaymentId, data);
+  }
+}
+
+async function handleOrderRefunded(data: Record<string, unknown>) {
+  const polarPaymentId = data.id as string;
+  if (!polarPaymentId) return;
+
+  // Mark payment as refunded
+  await db
+    .update(payments)
+    .set({ status: "refunded" })
+    .where(eq(payments.polarPaymentId, polarPaymentId));
+
+  console.log(`[Webhook] Payment refunded: ${polarPaymentId}`);
+
+  // Note: enrollment removal and refund email are handled by a separate refund task.
+  // For now, just update payment status.
+}
+
+// --- Course Purchase Helpers ---
+
+async function handleCourseEnrollment(
+  metadata: Record<string, string>,
+  polarPaymentId: string,
+  _data: Record<string, unknown>,
+) {
+  const userId = metadata.userId;
+  const courseId = metadata.courseId;
+  if (!userId || !courseId) {
+    console.error("[Webhook] Missing userId or courseId in course purchase metadata");
+    return;
+  }
+
+  // Idempotent enrollment insert: use onConflictDoNothing to handle concurrent
+  // webhook deliveries without throwing, ensuring Polar always gets 200
+  const result = await db
+    .insert(enrollments)
+    .values({
+      userId,
+      courseId,
+      paymentId: polarPaymentId,
+    })
+    .onConflictDoNothing({ target: [enrollments.userId, enrollments.courseId] })
+    .returning({ id: enrollments.id });
+
+  if (result.length === 0) {
+    console.log(
+      `[Webhook] Enrollment already exists for user=${userId} course=${courseId}, skipping`,
+    );
+    return;
+  }
+
+  console.log(`[Webhook] Enrollment created for user=${userId} course=${courseId}`);
+
+  // Send confirmation email (fire-and-forget)
+  try {
+    const [user] = await db.select().from(users).where(eq(users.id, userId)).limit(1);
+    const [course] = await db
+      .select({ title: courses.title, price: courses.price })
+      .from(courses)
+      .where(eq(courses.id, courseId))
+      .limit(1);
+
+    if (user && course) {
+      const courseSlug = metadata.courseSlug ?? "";
+      sendEmail({
+        to: user.email,
+        subject: `Course Enrolled - ${siteConfig.name}`,
+        react: CourseEnrollmentEmail({
+          name: user.name ?? undefined,
+          courseName: course.title,
+          price: course.price,
+          currency: "KRW",
+          learnUrl: `${siteConfig.url}/ko/learn/${courseSlug}`,
+        }),
+      }).catch((err) => {
+        console.error("[Webhook] Failed to send course enrollment email", err);
+      });
+    }
+  } catch (emailErr) {
+    console.error("[Webhook] Failed to query user/course for enrollment email", emailErr);
+  }
+}
+
+function mapCheckoutStatus(polarStatus: unknown): "pending" | "completed" | "failed" {
+  if (polarStatus === "succeeded") return "completed";
+  if (polarStatus === "failed" || polarStatus === "expired") return "failed";
+  return "pending";
 }
 
 function mapPolarStatus(

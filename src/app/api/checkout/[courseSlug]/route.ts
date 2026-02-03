@@ -7,6 +7,10 @@ import { eq, and } from "drizzle-orm";
 import { courseCheckoutSchema } from "@/shared/lib/validations";
 import { successResponse, errorResponse, zodErrorResponse } from "@/shared/lib/api";
 import { getAuthenticatedUser } from "@/shared/lib/api/auth";
+import { polar } from "@/shared/api/polar/client";
+import { sendEmail } from "@/shared/api/resend";
+import { CourseEnrollmentEmail } from "@/shared/api/resend/templates/course-enrollment";
+import { siteConfig } from "@/shared/config/site";
 
 type RouteContext = {
   params: Promise<{ courseSlug: string }>;
@@ -26,7 +30,7 @@ export async function POST(request: NextRequest, context: RouteContext) {
     if (!user) return errorResponse("UNAUTHORIZED", "Authentication required", 401);
 
     const [dbUser] = await db
-      .select({ id: users.id, email: users.email })
+      .select({ id: users.id, email: users.email, name: users.name })
       .from(users)
       .where(eq(users.supabaseUserId, user.id));
     if (!dbUser) return errorResponse("NOT_FOUND", "User not found", 404);
@@ -36,9 +40,11 @@ export async function POST(request: NextRequest, context: RouteContext) {
       .select({
         id: courses.id,
         title: courses.title,
+        slug: courses.slug,
         price: courses.price,
         isFree: courses.isFree,
         isPublished: courses.isPublished,
+        polarProductId: courses.polarProductId,
       })
       .from(courses)
       .where(eq(courses.slug, courseSlug))
@@ -57,10 +63,35 @@ export async function POST(request: NextRequest, context: RouteContext) {
 
     // 5. Free course: create enrollment directly
     if (course.isFree) {
-      const [enrollment] = await db
+      // Use onConflictDoNothing to handle race conditions on concurrent requests
+      const result = await db
         .insert(enrollments)
         .values({ userId: dbUser.id, courseId: course.id })
+        .onConflictDoNothing({ target: [enrollments.userId, enrollments.courseId] })
         .returning({ id: enrollments.id });
+
+      // If conflict occurred (concurrent request already enrolled), return 409
+      if (result.length === 0) {
+        return errorResponse("CONFLICT", "Already enrolled in this course", 409);
+      }
+
+      const [enrollment] = result;
+
+      // Send enrollment email (fire-and-forget)
+      sendEmail({
+        to: dbUser.email,
+        subject: `Course Enrolled - ${siteConfig.name}`,
+        react: CourseEnrollmentEmail({
+          name: dbUser.name ?? undefined,
+          courseName: course.title,
+          price: 0,
+          currency: "KRW",
+          learnUrl: `${siteConfig.url}/ko/learn/${courseSlug}`,
+        }),
+      }).catch((err) => {
+        console.error("[POST /api/checkout/[courseSlug]] Failed to send enrollment email", err);
+      });
+
       return successResponse(
         { enrolled: true, enrollmentId: enrollment.id },
         "Enrolled in free course",
@@ -69,23 +100,26 @@ export async function POST(request: NextRequest, context: RouteContext) {
     }
 
     // 6. Paid course: create Polar checkout session
-    // TODO: Full Polar integration handled in task-011.
-    // When implemented, use:
-    //   import { polar } from "@/shared/api/polar/client";
-    //   const checkout = await polar.checkouts.create({
-    //     products: [/* course.polarProductId -- courses table needs this field */],
-    //     successUrl: parsed.data.successUrl ?? `${process.env.NEXT_PUBLIC_APP_URL}/learn/${courseSlug}?checkout=success`,
-    //     customerEmail: dbUser.email,
-    //     metadata: {
-    //       userId: dbUser.id,
-    //       courseId: course.id,
-    //       courseSlug: courseSlug,
-    //       type: "course_purchase",
-    //     },
-    //   });
-    //   return successResponse({ checkoutUrl: checkout.url });
+    if (!course.polarProductId) {
+      return errorResponse("BAD_REQUEST", "This course is not configured for purchase yet", 400);
+    }
 
-    return errorResponse("NOT_IMPLEMENTED", "Paid course checkout is not yet available", 501);
+    // Construct success URL server-side (no user input) to prevent open redirect
+    const successUrl = `${siteConfig.url}/dashboard?checkout=success`;
+
+    const checkout = await polar.checkouts.create({
+      products: [course.polarProductId],
+      successUrl,
+      customerEmail: dbUser.email,
+      metadata: {
+        userId: dbUser.id,
+        courseId: course.id,
+        courseSlug: courseSlug,
+        type: "course_purchase",
+      },
+    });
+
+    return successResponse({ checkoutUrl: checkout.url });
   } catch (error) {
     console.error("[POST /api/checkout/[courseSlug]]", error);
     return errorResponse("INTERNAL_ERROR", "An unexpected error occurred", 500);

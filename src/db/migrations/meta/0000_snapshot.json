@@ -90,12 +90,8 @@
           "name": "payments_user_id_users_id_fk",
           "tableFrom": "payments",
           "tableTo": "users",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -105,9 +101,7 @@
         "payments_polar_payment_id_unique": {
           "name": "payments_polar_payment_id_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "polar_payment_id"
-          ]
+          "columns": ["polar_payment_id"]
         }
       },
       "policies": {},
@@ -213,12 +207,8 @@
           "name": "subscriptions_user_id_users_id_fk",
           "tableFrom": "subscriptions",
           "tableTo": "users",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -228,9 +218,7 @@
         "subscriptions_polar_subscription_id_unique": {
           "name": "subscriptions_polar_subscription_id_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "polar_subscription_id"
-          ]
+          "columns": ["polar_subscription_id"]
         }
       },
       "policies": {},
@@ -301,16 +289,12 @@
         "users_supabase_user_id_unique": {
           "name": "users_supabase_user_id_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "supabase_user_id"
-          ]
+          "columns": ["supabase_user_id"]
         },
         "users_email_unique": {
           "name": "users_email_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "email"
-          ]
+          "columns": ["email"]
         }
       },
       "policies": {},
@@ -322,24 +306,12 @@
     "public.payment_status": {
       "name": "payment_status",
       "schema": "public",
-      "values": [
-        "pending",
-        "completed",
-        "failed",
-        "refunded"
-      ]
+      "values": ["pending", "completed", "failed", "refunded"]
     },
     "public.subscription_status": {
       "name": "subscription_status",
       "schema": "public",
-      "values": [
-        "active",
-        "canceled",
-        "past_due",
-        "unpaid",
-        "incomplete",
-        "trialing"
-      ]
+      "values": ["active", "canceled", "past_due", "unpaid", "incomplete", "trialing"]
     }
   },
   "schemas": {},

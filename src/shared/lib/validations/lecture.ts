@@ -4,7 +4,6 @@ import { z } from "zod";
 
 /** POST /api/checkout/[courseSlug] */
 export const courseCheckoutSchema = z.object({
-  successUrl: z.string().url().optional(),
   couponCode: z.string().optional(),
 });
 
