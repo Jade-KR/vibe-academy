@@ -5,7 +5,8 @@ import { discussions } from "@/db/schema/discussions";
 import { lessons } from "@/db/schema/lessons";
 import { chapters } from "@/db/schema/chapters";
 import { enrollments } from "@/db/schema/enrollments";
-import { eq, and } from "drizzle-orm";
+import { users } from "@/db/schema/users";
+import { eq, and, asc } from "drizzle-orm";
 import { createCommentSchema } from "@/shared/lib/validations";
 import { successResponse, errorResponse, zodErrorResponse } from "@/shared/lib/api";
 import { getDbUser } from "@/shared/lib/api/get-db-user";
@@ -73,6 +74,69 @@ export async function POST(request: NextRequest, context: RouteContext) {
     return successResponse(created, "Comment created", 201);
   } catch (error) {
     console.error("[POST /api/discussions/[discussionId]/comments]", error);
+    return errorResponse("INTERNAL_ERROR", "An unexpected error occurred", 500);
+  }
+}
+
+export async function GET(_request: NextRequest, context: RouteContext) {
+  try {
+    const { discussionId } = await context.params;
+
+    // 1. Auth
+    const { dbUser, response } = await getDbUser();
+    if (!dbUser) return response;
+
+    // 2. Find discussion (verify it exists)
+    const [discussion] = await db
+      .select({ id: discussions.id, lessonId: discussions.lessonId })
+      .from(discussions)
+      .where(eq(discussions.id, discussionId))
+      .limit(1);
+    if (!discussion) return errorResponse("NOT_FOUND", "Discussion not found", 404);
+
+    // 3. Verify enrollment (same chain as POST)
+    const [lesson] = await db
+      .select({ chapterId: lessons.chapterId })
+      .from(lessons)
+      .where(eq(lessons.id, discussion.lessonId))
+      .limit(1);
+    if (!lesson) return errorResponse("NOT_FOUND", "Lesson not found", 404);
+
+    const [chapter] = await db
+      .select({ courseId: chapters.courseId })
+      .from(chapters)
+      .where(eq(chapters.id, lesson.chapterId))
+      .limit(1);
+    if (!chapter) return errorResponse("NOT_FOUND", "Chapter not found", 404);
+
+    const [enrollment] = await db
+      .select({ id: enrollments.id })
+      .from(enrollments)
+      .where(and(eq(enrollments.userId, dbUser.id), eq(enrollments.courseId, chapter.courseId)))
+      .limit(1);
+    if (!enrollment) return errorResponse("FORBIDDEN", "Not enrolled in this course", 403);
+
+    // 4. Fetch comments with user info
+    const items = await db
+      .select({
+        id: comments.id,
+        content: comments.content,
+        createdAt: comments.createdAt,
+        updatedAt: comments.updatedAt,
+        user: {
+          id: users.id,
+          name: users.name,
+          avatarUrl: users.avatarUrl,
+        },
+      })
+      .from(comments)
+      .innerJoin(users, eq(comments.userId, users.id))
+      .where(eq(comments.discussionId, discussionId))
+      .orderBy(asc(comments.createdAt));
+
+    return successResponse(items);
+  } catch (error) {
+    console.error("[GET /api/discussions/[discussionId]/comments]", error);
     return errorResponse("INTERNAL_ERROR", "An unexpected error occurred", 500);
   }
 }

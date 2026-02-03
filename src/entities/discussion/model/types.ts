@@ -1,50 +1,48 @@
-import type { Discussion, Comment } from "@/db/schema";
+/**
+ * Nested user object as returned by API (discussions and comments).
+ */
+export interface DiscussionUser {
+  id: string;
+  name: string | null;
+  avatarUrl: string | null;
+}
 
 /**
- * Discussion record as stored in DB.
+ * Discussion list item as returned by GET /api/lessons/{lessonId}/discussions.
  */
-export type DiscussionRecord = Discussion;
-
-/**
- * Discussion with joined user info and comment count.
- * Returned by GET /api/discussions?lessonId=xxx.
- */
-export interface DiscussionWithUser extends Discussion {
-  userName: string | null;
-  userAvatarUrl: string | null;
+export interface DiscussionListItem {
+  id: string;
+  title: string;
+  content: string;
+  createdAt: string;
+  updatedAt: string;
+  user: DiscussionUser;
   commentCount: number;
 }
 
 /**
- * Comment with joined user info.
+ * Comment list item as returned by GET /api/discussions/{discussionId}/comments.
  */
-export interface CommentWithUser extends Comment {
-  userName: string | null;
-  userAvatarUrl: string | null;
+export interface CommentListItem {
+  id: string;
+  content: string;
+  createdAt: string;
+  updatedAt: string;
+  user: DiscussionUser;
 }
 
 /**
- * Full discussion detail with comments.
- * Returned by GET /api/discussions/[id].
- */
-export interface DiscussionDetail extends DiscussionWithUser {
-  comments: CommentWithUser[];
-}
-
-/**
- * Request body for POST /api/discussions.
+ * Request body for POST /api/lessons/{lessonId}/discussions.
  */
 export interface CreateDiscussionRequest {
-  lessonId: string;
   title: string;
   content: string;
 }
 
 /**
- * Request body for POST /api/discussions/[id]/comments.
+ * Request body for POST /api/discussions/{discussionId}/comments.
  */
 export interface CreateCommentRequest {
-  discussionId: string;
   content: string;
 }
 
