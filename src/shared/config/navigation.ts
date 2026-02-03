@@ -69,6 +69,25 @@ export const dashboardNav: NavItem[] = [
 ] as const;
 
 /**
+ * Admin navigation (admin panel sidebar).
+ * Displayed in the admin sidebar/top bar for users with admin role.
+ */
+export const adminNav: NavItem[] = [
+  {
+    key: "admin-dashboard",
+    href: "/admin",
+    labelKey: "admin.dashboard.title",
+    icon: "LayoutDashboard",
+  },
+  {
+    key: "admin-courses",
+    href: "/admin/courses",
+    labelKey: "admin.courses.title",
+    icon: "BookOpen",
+  },
+] as const;
+
+/**
  * Routes that require authentication.
  * Used by middleware for route protection.
  */
@@ -78,11 +97,7 @@ export const protectedRoutes = ["/dashboard", "/learn", "/admin"] as const;
  * Routes only accessible to unauthenticated users.
  * Authenticated users are redirected to dashboard.
  */
-export const authOnlyRoutes = [
-  "/login",
-  "/register",
-  "/forgot-password",
-] as const;
+export const authOnlyRoutes = ["/login", "/register", "/forgot-password"] as const;
 
 export type ProtectedRoute = (typeof protectedRoutes)[number];
 export type AuthOnlyRoute = (typeof authOnlyRoutes)[number];
