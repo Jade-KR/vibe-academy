@@ -85,6 +85,24 @@ export const adminNav: NavItem[] = [
     labelKey: "admin.courses.title",
     icon: "BookOpen",
   },
+  {
+    key: "admin-users",
+    href: "/admin/users",
+    labelKey: "admin.users.title",
+    icon: "Users",
+  },
+  {
+    key: "admin-analytics",
+    href: "/admin/analytics",
+    labelKey: "admin.analytics.title",
+    icon: "BarChart3",
+  },
+  {
+    key: "admin-coupons",
+    href: "/admin/coupons",
+    labelKey: "admin.coupons.title",
+    icon: "Ticket",
+  },
 ] as const;
 
 /**
