@@ -23,3 +23,4 @@ export * from "./loading-spinner";
 export * from "./error-boundary";
 export * from "./seo";
 export * from "./accordion";
+export * from "./progress";
