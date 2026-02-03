@@ -488,6 +488,10 @@
   },
   "admin": {
     "title": "Admin",
+    "unexpectedError": "An unexpected error occurred",
+    "reorderFailed": "Failed to reorder",
+    "updateFailed": "Failed to update",
+    "deleteFailed": "Failed to delete",
     "dashboard": {
       "title": "Admin Dashboard",
       "totalCourses": "Total Courses",
@@ -510,12 +514,33 @@
         "slug": "URL Slug",
         "description": "Description",
         "shortDescription": "Short Description",
+        "longDescription": "Long Description",
         "category": "Category",
         "level": "Level",
         "price": "Price",
         "thumbnailUrl": "Thumbnail URL",
-        "previewVideoUrl": "Preview Video URL"
-      }
+        "previewVideoUrl": "Preview Video URL",
+        "instructorBio": "Instructor Bio",
+        "isFree": "Free Course",
+        "isFreeDescription": "This course is free",
+        "isPaidDescription": "This course is paid",
+        "levelBeginner": "Beginner",
+        "levelIntermediate": "Intermediate",
+        "levelAdvanced": "Advanced"
+      },
+      "created": "Course created",
+      "updated": "Course updated",
+      "createFailed": "Failed to create course",
+      "updateFailed": "Failed to update course",
+      "validationError": "Validation error",
+      "empty": "No courses yet",
+      "notFound": "Course not found",
+      "details": "Details",
+      "tableStatus": "Status",
+      "tableChapters": "Ch.",
+      "tableLessons": "Ls.",
+      "tableActions": "Actions",
+      "free": "Free"
     },
     "chapters": {
       "title": "Chapter Management",
@@ -523,6 +548,15 @@
       "edit": "Edit Chapter",
       "delete": "Delete Chapter",
       "reorder": "Reorder",
+      "added": "Chapter added",
+      "updated": "Chapter updated",
+      "deleted": "Chapter deleted",
+      "addFailed": "Failed to add chapter",
+      "updateFailed": "Failed to update chapter",
+      "deleteFailed": "Failed to delete chapter",
+      "deleteConfirm": "Are you sure? This will delete all lessons in this chapter.",
+      "empty": "No chapters yet",
+      "lessonCount": "{count} lessons",
       "form": {
         "title": "Chapter Title"
       }
@@ -533,6 +567,15 @@
       "edit": "Edit Lesson",
       "delete": "Delete Lesson",
       "isPreview": "Allow Preview",
+      "preview": "Preview",
+      "added": "Lesson added",
+      "updated": "Lesson updated",
+      "deleted": "Lesson deleted",
+      "addFailed": "Failed to add lesson",
+      "updateFailed": "Failed to update lesson",
+      "deleteFailed": "Failed to delete lesson",
+      "deleteConfirm": "Are you sure you want to delete this lesson?",
+      "empty": "No lessons yet",
       "form": {
         "title": "Lesson Title",
         "videoUrl": "Video URL",

@@ -30,7 +30,8 @@ import {
 } from "@/shared/ui";
 import { createCourseSchema, updateCourseSchema } from "@/shared/lib/validations";
 
-type CreateValues = z.output<typeof createCourseSchema>;
+type CreateValues = z.infer<typeof createCourseSchema>;
+type UpdateInput = z.input<typeof updateCourseSchema>;
 
 interface CourseFormProps {
   mode: "create" | "edit";
@@ -51,6 +52,7 @@ export function CourseForm({ mode, courseId, initialData, onSuccess }: CourseFor
   const slugTouched = useRef(false);
 
   const form = useForm<CreateValues>({
+    // zodResolver type mismatch with react-hook-form + zod v4 is a known upstream issue
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     resolver: zodResolver(createCourseSchema) as any,
     defaultValues: {
@@ -100,8 +102,6 @@ export function CourseForm({ mode, courseId, initialData, onSuccess }: CourseFor
 
   async function onSubmit(values: CreateValues) {
     try {
-      // Clean up empty optional string fields - convert to undefined for create, null for update
-      const cleaned = { ...values };
       const optionalStringFields = [
         "description",
         "longDescription",
@@ -111,40 +111,43 @@ export function CourseForm({ mode, courseId, initialData, onSuccess }: CourseFor
         "instructorBio",
       ] as const;
 
-      for (const field of optionalStringFields) {
-        if (cleaned[field] === "") {
-          if (mode === "create") {
-            delete (cleaned as Record<string, unknown>)[field];
-          } else {
-            (cleaned as Record<string, unknown>)[field] = null;
+      if (mode === "create") {
+        // Clean up empty optional string fields - convert to undefined for create
+        const createData: Partial<CreateValues> = { ...values };
+        for (const field of optionalStringFields) {
+          if (createData[field] === "") {
+            delete createData[field];
           }
         }
-      }
 
-      if (mode === "create") {
         const res = await fetch("/api/admin/courses", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(cleaned),
+          body: JSON.stringify(createData),
         });
         const json = await res.json();
         if (!json.success) {
-          toast.error(json.error?.message ?? "Failed to create course");
+          toast.error(json.error?.message ?? t("courses.createFailed"));
           return;
         }
-        toast.success("Course created");
+        toast.success(t("courses.created"));
         onSuccess?.(json.data.id);
       } else {
-        // For edit mode, validate with updateCourseSchema
-        const editData: Record<string, unknown> = {};
-        for (const [key, value] of Object.entries(cleaned)) {
+        // For edit mode, convert empty strings to null for optional fields
+        const editData: UpdateInput = {};
+        for (const [key, value] of Object.entries(values)) {
           if (value !== undefined) {
-            editData[key] = value;
+            const isOptionalString = (optionalStringFields as readonly string[]).includes(key);
+            if (isOptionalString && value === "") {
+              (editData as Record<keyof UpdateInput, unknown>)[key as keyof UpdateInput] = null;
+            } else {
+              (editData as Record<keyof UpdateInput, unknown>)[key as keyof UpdateInput] = value;
+            }
           }
         }
         const parsed = updateCourseSchema.safeParse(editData);
         if (!parsed.success) {
-          toast.error("Validation error");
+          toast.error(t("courses.validationError"));
           return;
         }
 
@@ -155,14 +158,16 @@ export function CourseForm({ mode, courseId, initialData, onSuccess }: CourseFor
         });
         const json = await res.json();
         if (!json.success) {
-          toast.error(json.error?.message ?? "Failed to update course");
+          toast.error(json.error?.message ?? t("courses.updateFailed"));
           return;
         }
-        toast.success("Course updated");
-        onSuccess?.(courseId!);
+        toast.success(t("courses.updated"));
+        if (courseId) {
+          onSuccess?.(courseId);
+        }
       }
     } catch {
-      toast.error("An unexpected error occurred");
+      toast.error(t("unexpectedError"));
     }
   }
 
@@ -244,7 +249,7 @@ export function CourseForm({ mode, courseId, initialData, onSuccess }: CourseFor
                   name="instructorBio"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Instructor Bio</FormLabel>
+                      <FormLabel>{t("courses.form.instructorBio")}</FormLabel>
                       <FormControl>
                         <Textarea {...field} rows={4} />
                       </FormControl>
@@ -288,9 +293,15 @@ export function CourseForm({ mode, courseId, initialData, onSuccess }: CourseFor
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          <SelectItem value="beginner">Beginner</SelectItem>
-                          <SelectItem value="intermediate">Intermediate</SelectItem>
-                          <SelectItem value="advanced">Advanced</SelectItem>
+                          <SelectItem value="beginner">
+                            {t("courses.form.levelBeginner")}
+                          </SelectItem>
+                          <SelectItem value="intermediate">
+                            {t("courses.form.levelIntermediate")}
+                          </SelectItem>
+                          <SelectItem value="advanced">
+                            {t("courses.form.levelAdvanced")}
+                          </SelectItem>
                         </SelectContent>
                       </Select>
                       <FormMessage />
@@ -364,9 +375,11 @@ export function CourseForm({ mode, courseId, initialData, onSuccess }: CourseFor
                   render={({ field }) => (
                     <FormItem className="flex items-center justify-between rounded-lg border p-3">
                       <div className="space-y-0.5">
-                        <FormLabel>Free Course</FormLabel>
+                        <FormLabel>{t("courses.form.isFree")}</FormLabel>
                         <FormDescription>
-                          {field.value ? "This course is free" : "This course is paid"}
+                          {field.value
+                            ? t("courses.form.isFreeDescription")
+                            : t("courses.form.isPaidDescription")}
                         </FormDescription>
                       </div>
                       <FormControl>

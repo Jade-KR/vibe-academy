@@ -77,14 +77,16 @@ export function LessonDialog({
   }, [open, initialData, form]);
 
   async function handleSubmit(values: LessonFormValues) {
-    // Clean empty strings to undefined
-    const cleaned: Record<string, unknown> = { title: values.title };
+    // Clean empty strings to undefined for optional fields
+    const cleaned: LessonFormValues = {
+      title: values.title,
+      isPreview: values.isPreview,
+    };
     if (values.description) cleaned.description = values.description;
     if (values.videoUrl) cleaned.videoUrl = values.videoUrl;
     if (values.duration && values.duration > 0) cleaned.duration = values.duration;
-    cleaned.isPreview = values.isPreview;
 
-    await onSubmit(cleaned as LessonFormValues);
+    await onSubmit(cleaned);
     onOpenChange(false);
   }
 

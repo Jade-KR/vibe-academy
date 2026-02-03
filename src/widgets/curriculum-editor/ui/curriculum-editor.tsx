@@ -195,7 +195,7 @@ export function CurriculumEditor({
       <CardContent>
         {localChapters.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-12 text-center">
-            <p className="text-muted-foreground mb-4">No chapters yet</p>
+            <p className="text-muted-foreground mb-4">{t("chapters.empty")}</p>
             <Button
               variant="outline"
               onClick={() => setChapterDialog({ open: true, mode: "create" })}
@@ -300,8 +300,8 @@ export function CurriculumEditor({
             </DialogTitle>
             <DialogDescription>
               {deleteConfirm?.type === "chapter"
-                ? "Are you sure? This will delete all lessons in this chapter."
-                : "Are you sure you want to delete this lesson?"}
+                ? t("chapters.deleteConfirm")
+                : t("lessons.deleteConfirm")}
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>

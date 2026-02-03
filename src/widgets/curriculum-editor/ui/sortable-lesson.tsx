@@ -59,7 +59,7 @@ export function SortableLesson({ lesson, onEdit, onDelete, onTogglePreview }: So
       {lesson.isPreview ? (
         <Badge variant="outline" className="text-xs">
           <Eye className="mr-1 h-3 w-3" />
-          Preview
+          {t("lessons.preview")}
         </Badge>
       ) : null}
 

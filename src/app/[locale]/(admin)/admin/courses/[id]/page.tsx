@@ -32,7 +32,7 @@ export default function AdminCourseEditPage() {
   if (error || !course) {
     return (
       <div className="flex items-center justify-center py-16">
-        <p className="text-muted-foreground">Course not found</p>
+        <p className="text-muted-foreground">{t("courses.notFound")}</p>
       </div>
     );
   }
@@ -43,7 +43,7 @@ export default function AdminCourseEditPage() {
 
       <Tabs defaultValue="details">
         <TabsList>
-          <TabsTrigger value="details">Details</TabsTrigger>
+          <TabsTrigger value="details">{t("courses.details")}</TabsTrigger>
           <TabsTrigger value="curriculum">{t("chapters.title")}</TabsTrigger>
         </TabsList>
 

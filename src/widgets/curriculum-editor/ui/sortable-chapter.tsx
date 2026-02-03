@@ -68,7 +68,7 @@ export function SortableChapter({
         <span className="flex-1 font-medium truncate">{chapter.title}</span>
 
         <Badge variant="secondary" className="text-xs">
-          {chapter.lessons.length} lessons
+          {t("chapters.lessonCount", { count: chapter.lessons.length })}
         </Badge>
 
         <Button variant="ghost" size="icon" className="h-8 w-8" onClick={onAddLesson}>
@@ -91,7 +91,7 @@ export function SortableChapter({
       {expanded ? (
         <div className="space-y-1 px-3 pb-3 pl-10">
           {chapter.lessons.length === 0 ? (
-            <p className="py-4 text-center text-sm text-muted-foreground">No lessons yet</p>
+            <p className="py-4 text-center text-sm text-muted-foreground">{t("lessons.empty")}</p>
           ) : (
             <SortableContext items={lessonIds} strategy={verticalListSortingStrategy}>
               {chapter.lessons.map((lesson) => (

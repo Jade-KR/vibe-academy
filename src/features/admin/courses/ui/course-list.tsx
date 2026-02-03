@@ -18,8 +18,7 @@ import {
 } from "@/shared/ui";
 import { useAdminCourses } from "../model/use-admin-courses";
 
-function formatPrice(price: number, isFree: boolean): string {
-  if (isFree) return "Free";
+function formatPrice(price: number): string {
   return new Intl.NumberFormat("ko-KR", { style: "currency", currency: "KRW" }).format(price);
 }
 
@@ -39,13 +38,13 @@ export function CourseList() {
       });
       const json = await res.json();
       if (!json.success) {
-        toast.error(json.error?.message ?? "Failed to update");
+        toast.error(json.error?.message ?? t("updateFailed"));
         return;
       }
       toast.success(currentlyPublished ? t("courses.unpublish") : t("courses.publish"));
       mutate();
     } catch {
-      toast.error("An unexpected error occurred");
+      toast.error(t("unexpectedError"));
     }
   }
 
@@ -56,13 +55,13 @@ export function CourseList() {
       const res = await fetch(`/api/admin/courses/${deleteId}`, { method: "DELETE" });
       const json = await res.json();
       if (!json.success) {
-        toast.error(json.error?.message ?? "Failed to delete");
+        toast.error(json.error?.message ?? t("deleteFailed"));
         return;
       }
       toast.success(t("courses.delete"));
       mutate();
     } catch {
-      toast.error("An unexpected error occurred");
+      toast.error(t("unexpectedError"));
     } finally {
       setDeleting(false);
       setDeleteId(null);
@@ -92,7 +91,7 @@ export function CourseList() {
       ) : courses.length === 0 ? (
         /* Empty state */
         <div className="flex flex-col items-center justify-center py-16 text-center">
-          <p className="text-muted-foreground mb-4">No courses yet</p>
+          <p className="text-muted-foreground mb-4">{t("courses.empty")}</p>
           <Button asChild>
             <Link href="/admin/courses/new">
               <Plus className="mr-2 h-4 w-4" />
@@ -108,10 +107,10 @@ export function CourseList() {
             <div>{t("courses.form.title")}</div>
             <div>{t("courses.form.level")}</div>
             <div>{t("courses.form.price")}</div>
-            <div>Status</div>
-            <div>Ch.</div>
-            <div>Ls.</div>
-            <div className="text-right">Actions</div>
+            <div>{t("courses.tableStatus")}</div>
+            <div>{t("courses.tableChapters")}</div>
+            <div>{t("courses.tableLessons")}</div>
+            <div className="text-right">{t("courses.tableActions")}</div>
           </div>
 
           {/* Data rows */}
@@ -136,9 +135,9 @@ export function CourseList() {
               {/* Price */}
               <div className="hidden text-sm md:block">
                 {course.isFree ? (
-                  <Badge variant="secondary">Free</Badge>
+                  <Badge variant="secondary">{t("courses.free")}</Badge>
                 ) : (
-                  formatPrice(course.price, false)
+                  formatPrice(course.price)
                 )}
               </div>
 

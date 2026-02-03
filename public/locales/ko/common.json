@@ -488,6 +488,10 @@
   },
   "admin": {
     "title": "관리자",
+    "unexpectedError": "예기치 않은 오류가 발생했습니다",
+    "reorderFailed": "순서 변경에 실패했습니다",
+    "updateFailed": "수정에 실패했습니다",
+    "deleteFailed": "삭제에 실패했습니다",
     "dashboard": {
       "title": "관리자 대시보드",
       "totalCourses": "전체 강의",
@@ -510,12 +514,33 @@
         "slug": "URL 슬러그",
         "description": "강의 설명",
         "shortDescription": "짧은 설명",
+        "longDescription": "상세 설명",
         "category": "카테고리",
         "level": "난이도",
         "price": "가격",
         "thumbnailUrl": "썸네일 URL",
-        "previewVideoUrl": "미리보기 영상 URL"
-      }
+        "previewVideoUrl": "미리보기 영상 URL",
+        "instructorBio": "강사 소개",
+        "isFree": "무료 강의",
+        "isFreeDescription": "이 강의는 무료입니다",
+        "isPaidDescription": "이 강의는 유료입니다",
+        "levelBeginner": "초급",
+        "levelIntermediate": "중급",
+        "levelAdvanced": "고급"
+      },
+      "created": "강의가 생성되었습니다",
+      "updated": "강의가 수정되었습니다",
+      "createFailed": "강의 생성에 실패했습니다",
+      "updateFailed": "강의 수정에 실패했습니다",
+      "validationError": "입력값 오류",
+      "empty": "등록된 강의가 없습니다",
+      "notFound": "강의를 찾을 수 없습니다",
+      "details": "상세 정보",
+      "tableStatus": "상태",
+      "tableChapters": "챕터",
+      "tableLessons": "레슨",
+      "tableActions": "작업",
+      "free": "무료"
     },
     "chapters": {
       "title": "챕터 관리",
@@ -523,6 +548,15 @@
       "edit": "챕터 수정",
       "delete": "챕터 삭제",
       "reorder": "순서 변경",
+      "added": "챕터가 추가되었습니다",
+      "updated": "챕터가 수정되었습니다",
+      "deleted": "챕터가 삭제되었습니다",
+      "addFailed": "챕터 추가에 실패했습니다",
+      "updateFailed": "챕터 수정에 실패했습니다",
+      "deleteFailed": "챕터 삭제에 실패했습니다",
+      "deleteConfirm": "이 챕터를 삭제하시겠습니까? 모든 레슨이 함께 삭제됩니다.",
+      "empty": "아직 챕터가 없습니다",
+      "lessonCount": "{count}개 레슨",
       "form": {
         "title": "챕터 제목"
       }
@@ -533,6 +567,15 @@
       "edit": "레슨 수정",
       "delete": "레슨 삭제",
       "isPreview": "미리보기 허용",
+      "preview": "미리보기",
+      "added": "레슨이 추가되었습니다",
+      "updated": "레슨이 수정되었습니다",
+      "deleted": "레슨이 삭제되었습니다",
+      "addFailed": "레슨 추가에 실패했습니다",
+      "updateFailed": "레슨 수정에 실패했습니다",
+      "deleteFailed": "레슨 삭제에 실패했습니다",
+      "deleteConfirm": "이 레슨을 삭제하시겠습니까?",
+      "empty": "아직 레슨이 없습니다",
       "form": {
         "title": "레슨 제목",
         "videoUrl": "영상 URL",

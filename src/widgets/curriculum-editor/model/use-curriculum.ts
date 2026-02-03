@@ -1,7 +1,16 @@
 "use client";
 
 import { useCallback } from "react";
+import { useTranslations } from "next-intl";
 import { toast } from "sonner";
+
+export interface UpdateLessonData {
+  title?: string;
+  description?: string | null;
+  videoUrl?: string | null;
+  duration?: number | null;
+  isPreview?: boolean;
+}
 
 interface UseCurriculumOptions {
   courseId: string;
@@ -21,6 +30,8 @@ async function apiFetch(url: string, options: RequestInit) {
 }
 
 export function useCurriculum({ courseId, onMutate }: UseCurriculumOptions) {
+  const t = useTranslations("admin");
+
   const addChapter = useCallback(
     async (title: string) => {
       try {
@@ -28,13 +39,13 @@ export function useCurriculum({ courseId, onMutate }: UseCurriculumOptions) {
           method: "POST",
           body: JSON.stringify({ title }),
         });
-        toast.success("Chapter added");
+        toast.success(t("chapters.added"));
         onMutate();
       } catch (err) {
-        toast.error(err instanceof Error ? err.message : "Failed to add chapter");
+        toast.error(err instanceof Error ? err.message : t("chapters.addFailed"));
       }
     },
-    [courseId, onMutate],
+    [courseId, onMutate, t],
   );
 
   const updateChapter = useCallback(
@@ -44,26 +55,26 @@ export function useCurriculum({ courseId, onMutate }: UseCurriculumOptions) {
           method: "PATCH",
           body: JSON.stringify({ title }),
         });
-        toast.success("Chapter updated");
+        toast.success(t("chapters.updated"));
         onMutate();
       } catch (err) {
-        toast.error(err instanceof Error ? err.message : "Failed to update chapter");
+        toast.error(err instanceof Error ? err.message : t("chapters.updateFailed"));
       }
     },
-    [onMutate],
+    [onMutate, t],
   );
 
   const deleteChapter = useCallback(
     async (chapterId: string) => {
       try {
         await apiFetch(`/api/admin/chapters/${chapterId}`, { method: "DELETE" });
-        toast.success("Chapter deleted");
+        toast.success(t("chapters.deleted"));
         onMutate();
       } catch (err) {
-        toast.error(err instanceof Error ? err.message : "Failed to delete chapter");
+        toast.error(err instanceof Error ? err.message : t("chapters.deleteFailed"));
       }
     },
-    [onMutate],
+    [onMutate, t],
   );
 
   const addLesson = useCallback(
@@ -82,42 +93,42 @@ export function useCurriculum({ courseId, onMutate }: UseCurriculumOptions) {
           method: "POST",
           body: JSON.stringify(data),
         });
-        toast.success("Lesson added");
+        toast.success(t("lessons.added"));
         onMutate();
       } catch (err) {
-        toast.error(err instanceof Error ? err.message : "Failed to add lesson");
+        toast.error(err instanceof Error ? err.message : t("lessons.addFailed"));
       }
     },
-    [onMutate],
+    [onMutate, t],
   );
 
   const updateLesson = useCallback(
-    async (lessonId: string, data: Record<string, unknown>) => {
+    async (lessonId: string, data: UpdateLessonData) => {
       try {
         await apiFetch(`/api/admin/lessons/${lessonId}`, {
           method: "PATCH",
           body: JSON.stringify(data),
         });
-        toast.success("Lesson updated");
+        toast.success(t("lessons.updated"));
         onMutate();
       } catch (err) {
-        toast.error(err instanceof Error ? err.message : "Failed to update lesson");
+        toast.error(err instanceof Error ? err.message : t("lessons.updateFailed"));
       }
     },
-    [onMutate],
+    [onMutate, t],
   );
 
   const deleteLesson = useCallback(
     async (lessonId: string) => {
       try {
         await apiFetch(`/api/admin/lessons/${lessonId}`, { method: "DELETE" });
-        toast.success("Lesson deleted");
+        toast.success(t("lessons.deleted"));
         onMutate();
       } catch (err) {
-        toast.error(err instanceof Error ? err.message : "Failed to delete lesson");
+        toast.error(err instanceof Error ? err.message : t("lessons.deleteFailed"));
       }
     },
-    [onMutate],
+    [onMutate, t],
   );
 
   const reorder = useCallback(
@@ -130,11 +141,11 @@ export function useCurriculum({ courseId, onMutate }: UseCurriculumOptions) {
           body: JSON.stringify({ chapters: chaptersData }),
         });
       } catch (err) {
-        toast.error(err instanceof Error ? err.message : "Failed to reorder");
+        toast.error(err instanceof Error ? err.message : t("reorderFailed"));
         onMutate(); // Revert optimistic update
       }
     },
-    [courseId, onMutate],
+    [courseId, onMutate, t],
   );
 
   return {
