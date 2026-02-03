@@ -15,5 +15,8 @@ export type {
   CurriculumData,
 } from "./api/use-curriculum";
 
+export { useLearnLesson } from "./api/use-learn-lesson";
+export type { LearnLessonData } from "./api/use-learn-lesson";
+
 /** @deprecated Use `useCurriculum` instead. */
 export { useProgress } from "./api/use-progress";

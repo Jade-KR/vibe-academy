@@ -4,3 +4,5 @@ export { calculateChapterProgress, calculateCourseProgress } from "./lib/progres
 export type { ChapterProgressResult } from "./lib/progress-calc";
 export { findNextLesson } from "./lib/find-next-lesson";
 export type { NextLessonResult } from "./lib/find-next-lesson";
+export { findPreviousLesson } from "./lib/find-previous-lesson";
+export type { PreviousLessonResult } from "./lib/find-previous-lesson";
