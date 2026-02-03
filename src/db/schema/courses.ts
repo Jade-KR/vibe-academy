@@ -1,4 +1,4 @@
-import { pgTable, uuid, text, integer, boolean, timestamp } from "drizzle-orm/pg-core";
+import { pgTable, uuid, varchar, text, integer, boolean, timestamp } from "drizzle-orm/pg-core";
 import type { InferSelectModel, InferInsertModel } from "drizzle-orm";
 import { courseLevelEnum } from "./enums";
 
@@ -16,6 +16,7 @@ export const courses = pgTable("courses", {
   instructorBio: text("instructor_bio"),
   isPublished: boolean("is_published").default(false).notNull(),
   isFree: boolean("is_free").default(false).notNull(),
+  polarProductId: varchar("polar_product_id", { length: 255 }),
   createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
   updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
 });

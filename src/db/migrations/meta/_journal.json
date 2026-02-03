@@ -8,6 +8,13 @@
       "when": 1769516929895,
       "tag": "0000_init",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1770078511223,
+      "tag": "0001_dapper_kitty_pryde",
+      "breakpoints": true
     }
   ]
 }
