@@ -6,11 +6,12 @@ import { payments } from "@/db/schema/payments";
 import { users } from "@/db/schema/users";
 import { enrollments } from "@/db/schema/enrollments";
 import { courses } from "@/db/schema/courses";
-import { eq } from "drizzle-orm";
+import { eq, and } from "drizzle-orm";
 import { errorResponse } from "@/shared/lib/api";
 import { sendEmail } from "@/shared/api/resend";
 import { SubscriptionEmail } from "@/shared/api/resend/templates/subscription";
 import { CourseEnrollmentEmail } from "@/shared/api/resend/templates/course-enrollment";
+import { RefundEmail } from "@/shared/api/resend/templates/refund";
 import { siteConfig } from "@/shared/config/site";
 
 // No auth -- webhooks are verified by signature only
@@ -251,16 +252,84 @@ async function handleOrderRefunded(data: Record<string, unknown>) {
   const polarPaymentId = data.id as string;
   if (!polarPaymentId) return;
 
-  // Mark payment as refunded
-  await db
+  // 1. Mark payment as refunded and retrieve the record in one round-trip
+  const [refundedPayment] = await db
     .update(payments)
     .set({ status: "refunded" })
-    .where(eq(payments.polarPaymentId, polarPaymentId));
+    .where(eq(payments.polarPaymentId, polarPaymentId))
+    .returning({
+      id: payments.id,
+      userId: payments.userId,
+      amount: payments.amount,
+      currency: payments.currency,
+      metadata: payments.metadata,
+    });
+
+  if (!refundedPayment) {
+    console.log(`[Webhook] Payment not found for refund: ${polarPaymentId}`);
+    return;
+  }
 
   console.log(`[Webhook] Payment refunded: ${polarPaymentId}`);
 
-  // Note: enrollment removal and refund email are handled by a separate refund task.
-  // For now, just update payment status.
+  // 2. Parse stored metadata to check if this was a course purchase
+  let storedMeta: Record<string, unknown> | null = null;
+  try {
+    if (refundedPayment.metadata) {
+      const parsed = JSON.parse(refundedPayment.metadata);
+      // Polar event data wraps checkout metadata inside data.metadata,
+      // so the stored JSON may have metadata at parsed.metadata or top-level
+      storedMeta = parsed?.metadata ?? parsed;
+    }
+  } catch {
+    console.error(`[Webhook] Failed to parse payment metadata for ${polarPaymentId}`);
+    return;
+  }
+
+  const isCourse = (storedMeta as Record<string, string> | null)?.type === "course_purchase";
+  if (!isCourse) return;
+
+  const userId = refundedPayment.userId;
+  const courseId = (storedMeta as Record<string, string>).courseId;
+  if (!courseId) {
+    console.error(`[Webhook] Missing courseId in refund metadata for ${polarPaymentId}`);
+    return;
+  }
+
+  // 3. Delete enrollment
+  await db
+    .delete(enrollments)
+    .where(and(eq(enrollments.userId, userId), eq(enrollments.courseId, courseId)));
+
+  console.log(`[Webhook] Enrollment revoked for user=${userId} course=${courseId}`);
+
+  // 4. Send refund email (fire-and-forget)
+  try {
+    const [user] = await db.select().from(users).where(eq(users.id, userId)).limit(1);
+    const [course] = await db
+      .select({ title: courses.title })
+      .from(courses)
+      .where(eq(courses.id, courseId))
+      .limit(1);
+
+    if (user && course) {
+      sendEmail({
+        to: user.email,
+        subject: `Refund Processed - ${siteConfig.name}`,
+        react: RefundEmail({
+          name: user.name ?? undefined,
+          courseName: course.title,
+          amount: refundedPayment.amount,
+          currency: refundedPayment.currency,
+          dashboardUrl: `${siteConfig.url}/dashboard`,
+        }),
+      }).catch((err) => {
+        console.error("[Webhook] Failed to send refund email", err);
+      });
+    }
+  } catch (emailErr) {
+    console.error("[Webhook] Failed to query user/course for refund email", emailErr);
+  }
 }
 
 // --- Course Purchase Helpers ---
