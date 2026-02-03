@@ -7,14 +7,22 @@ export type EnrollmentRecord = Enrollment;
 
 /**
  * Enrollment with joined course info and progress.
+ * Matches the actual shape returned by GET /api/enrollments.
  * Used in the "My Courses" dashboard listing.
- * Returned by GET /api/enrollments.
  */
-export interface EnrollmentWithCourse extends Enrollment {
-  courseTitle: string;
-  courseSlug: string;
-  courseThumbnailUrl: string | null;
+export interface EnrollmentWithCourse {
+  id: string;
+  purchasedAt: string;
+  course: {
+    id: string;
+    title: string;
+    slug: string;
+    thumbnailUrl: string | null;
+    level: string;
+  };
   progressPercent: number;
+  completedLessons: number;
+  totalLessons: number;
 }
 
 /**
