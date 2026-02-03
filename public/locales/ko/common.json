@@ -348,7 +348,46 @@
       "hero": {
         "enrollCta": "수강 신청하기",
         "previewVideo": "소개 영상 보기"
-      }
+      },
+      "purchaseWidget": {
+        "title": "수강 정보",
+        "enrollFree": "무료 수강하기",
+        "enrollPaid": "수강권 구매하기",
+        "loginRequired": "로그인 후 수강하기",
+        "processing": "처리 중..."
+      },
+      "curriculum": {
+        "totalChapters": "{count}개 챕터",
+        "expandAll": "모두 펼치기",
+        "collapseAll": "모두 접기"
+      },
+      "reviews": {
+        "showMore": "수강평 더 보기"
+      },
+      "faq": {
+        "items": {
+          "0": {
+            "q": "수강 기간에 제한이 있나요?",
+            "a": "아니요, 한 번 등록하면 평생 수강 가능합니다."
+          },
+          "1": {
+            "q": "환불은 어떻게 하나요?",
+            "a": "구매 후 7일 이내, 5개 영상 미만 시청 시 환불 가능합니다."
+          },
+          "2": {
+            "q": "수료증이 발급되나요?",
+            "a": "네, 모든 레슨을 완료하면 수료증이 발급됩니다."
+          },
+          "3": {
+            "q": "질문은 어디에 할 수 있나요?",
+            "a": "각 레슨의 토론 패널에서 질문하실 수 있습니다."
+          }
+        }
+      },
+      "notFound": "강의를 찾을 수 없습니다",
+      "notFoundDescription": "요청하신 강의가 존재하지 않거나 비공개 상태입니다.",
+      "errorTitle": "강의를 불러올 수 없습니다",
+      "errorDescription": "잠시 후 다시 시도해 주세요."
     }
   },
   "learn": {

@@ -348,7 +348,46 @@
       "hero": {
         "enrollCta": "Enroll Now",
         "previewVideo": "Watch Preview"
-      }
+      },
+      "purchaseWidget": {
+        "title": "Course Info",
+        "enrollFree": "Enroll Free",
+        "enrollPaid": "Purchase Course",
+        "loginRequired": "Login to Enroll",
+        "processing": "Processing..."
+      },
+      "curriculum": {
+        "totalChapters": "{count} chapters",
+        "expandAll": "Expand all",
+        "collapseAll": "Collapse all"
+      },
+      "reviews": {
+        "showMore": "Show more reviews"
+      },
+      "faq": {
+        "items": {
+          "0": {
+            "q": "Is there a time limit for access?",
+            "a": "No, once enrolled you have lifetime access."
+          },
+          "1": {
+            "q": "How can I get a refund?",
+            "a": "Refunds are available within 7 days of purchase if fewer than 5 videos have been watched."
+          },
+          "2": {
+            "q": "Will I receive a certificate?",
+            "a": "Yes, a certificate of completion is issued when you finish all lessons."
+          },
+          "3": {
+            "q": "Where can I ask questions?",
+            "a": "You can ask questions in the discussion panel of each lesson."
+          }
+        }
+      },
+      "notFound": "Course not found",
+      "notFoundDescription": "The requested course does not exist or is not published.",
+      "errorTitle": "Could not load course",
+      "errorDescription": "Please try again later."
     }
   },
   "learn": {
