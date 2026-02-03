@@ -426,7 +426,15 @@
     },
     "notEnrolled": "Enrollment required",
     "notEnrolledDescription": "Please enroll in this course to start learning.",
-    "goToCourse": "Go to Course"
+    "goToCourse": "Go to Course",
+    "errorLoadingCourse": "Could not load course",
+    "errorLoadingLesson": "Could not load lesson",
+    "errorRenderingContent": "Could not render lesson content",
+    "retry": "Retry",
+    "showCurriculum": "Show curriculum",
+    "hideCurriculum": "Hide curriculum",
+    "showDiscussion": "Show discussion",
+    "hideDiscussion": "Hide discussion"
   },
   "review": {
     "title": "Reviews",
