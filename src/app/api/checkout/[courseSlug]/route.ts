@@ -63,10 +63,19 @@ export async function POST(request: NextRequest, context: RouteContext) {
 
     // 5. Free course: create enrollment directly
     if (course.isFree) {
-      const [enrollment] = await db
+      // Use onConflictDoNothing to handle race conditions on concurrent requests
+      const result = await db
         .insert(enrollments)
         .values({ userId: dbUser.id, courseId: course.id })
+        .onConflictDoNothing({ target: [enrollments.userId, enrollments.courseId] })
         .returning({ id: enrollments.id });
+
+      // If conflict occurred (concurrent request already enrolled), return 409
+      if (result.length === 0) {
+        return errorResponse("CONFLICT", "Already enrolled in this course", 409);
+      }
+
+      const [enrollment] = result;
 
       // Send enrollment email (fire-and-forget)
       sendEmail({
@@ -95,11 +104,12 @@ export async function POST(request: NextRequest, context: RouteContext) {
       return errorResponse("BAD_REQUEST", "This course is not configured for purchase yet", 400);
     }
 
+    // Construct success URL server-side (no user input) to prevent open redirect
+    const successUrl = `${siteConfig.url}/dashboard?checkout=success`;
+
     const checkout = await polar.checkouts.create({
       products: [course.polarProductId],
-      successUrl:
-        parsed.data.successUrl ??
-        `${process.env.NEXT_PUBLIC_APP_URL}/ko/learn/${courseSlug}?checkout=success`,
+      successUrl,
       customerEmail: dbUser.email,
       metadata: {
         userId: dbUser.id,

@@ -6,7 +6,7 @@ import { payments } from "@/db/schema/payments";
 import { users } from "@/db/schema/users";
 import { enrollments } from "@/db/schema/enrollments";
 import { courses } from "@/db/schema/courses";
-import { eq, and } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 import { errorResponse } from "@/shared/lib/api";
 import { sendEmail } from "@/shared/api/resend";
 import { SubscriptionEmail } from "@/shared/api/resend/templates/subscription";
@@ -267,7 +267,7 @@ async function handleOrderRefunded(data: Record<string, unknown>) {
 
 async function handleCourseEnrollment(
   metadata: Record<string, string>,
-  _polarPaymentId: string,
+  polarPaymentId: string,
   _data: Record<string, unknown>,
 ) {
   const userId = metadata.userId;
@@ -277,26 +277,24 @@ async function handleCourseEnrollment(
     return;
   }
 
-  // Idempotency: check if enrollment already exists
-  const [existing] = await db
-    .select({ id: enrollments.id })
-    .from(enrollments)
-    .where(and(eq(enrollments.userId, userId), eq(enrollments.courseId, courseId)))
-    .limit(1);
+  // Idempotent enrollment insert: use onConflictDoNothing to handle concurrent
+  // webhook deliveries without throwing, ensuring Polar always gets 200
+  const result = await db
+    .insert(enrollments)
+    .values({
+      userId,
+      courseId,
+      paymentId: polarPaymentId,
+    })
+    .onConflictDoNothing({ target: [enrollments.userId, enrollments.courseId] })
+    .returning({ id: enrollments.id });
 
-  if (existing) {
+  if (result.length === 0) {
     console.log(
       `[Webhook] Enrollment already exists for user=${userId} course=${courseId}, skipping`,
     );
     return;
   }
-
-  // Create enrollment
-  await db.insert(enrollments).values({
-    userId,
-    courseId,
-    paymentId: _polarPaymentId,
-  });
 
   console.log(`[Webhook] Enrollment created for user=${userId} course=${courseId}`);
 
