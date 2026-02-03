@@ -15,11 +15,26 @@ vi.mock("@/shared/api/polar/webhooks", () => ({
 }));
 
 // Drizzle mock chains
-const mockInsertValues = vi.fn().mockResolvedValue(undefined);
-const mockUpdateWhere = vi.fn().mockResolvedValue(undefined);
+
+// Insert chain: values() -> onConflictDoNothing() -> returning()
+const mockInsertReturning = vi.fn().mockResolvedValue([]);
+const mockInsertOnConflictDoNothing = vi.fn().mockImplementation(() => ({
+  returning: mockInsertReturning,
+}));
+const mockInsertValues = vi.fn().mockImplementation(() => ({
+  onConflictDoNothing: mockInsertOnConflictDoNothing,
+}));
+
+// Update chain: set() -> where() -> returning()
+const mockUpdateReturning = vi.fn().mockResolvedValue([]);
+const mockUpdateWhere = vi.fn().mockImplementation(() => ({
+  returning: mockUpdateReturning,
+}));
 const mockUpdateSet = vi.fn().mockImplementation(() => ({
   where: mockUpdateWhere,
 }));
+
+// Select chain: from() -> where() -> limit()
 const mockSelectLimit = vi.fn().mockResolvedValue([]);
 const mockSelectWhere = vi.fn().mockImplementation(() => ({
   limit: mockSelectLimit,
@@ -27,6 +42,9 @@ const mockSelectWhere = vi.fn().mockImplementation(() => ({
 const mockSelectFrom = vi.fn().mockImplementation(() => ({
   where: mockSelectWhere,
 }));
+
+// Delete chain: where()
+const mockDeleteWhere = vi.fn().mockResolvedValue(undefined);
 
 vi.mock("@/db/client", () => ({
   db: {
@@ -39,11 +57,15 @@ vi.mock("@/db/client", () => ({
     select: vi.fn().mockImplementation(() => ({
       from: mockSelectFrom,
     })),
+    delete: vi.fn().mockImplementation(() => ({
+      where: mockDeleteWhere,
+    })),
   },
 }));
 
 vi.mock("drizzle-orm", () => ({
   eq: vi.fn().mockImplementation((col, val) => ({ col, val })),
+  and: vi.fn().mockImplementation((...conditions: unknown[]) => ({ and: conditions })),
 }));
 
 // Resend email mock
@@ -55,6 +77,20 @@ vi.mock("@/shared/api/resend", () => ({
 vi.mock("@/shared/api/resend/templates/subscription", () => ({
   SubscriptionEmail: vi.fn((props: Record<string, unknown>) => ({
     type: "SubscriptionEmail",
+    props,
+  })),
+}));
+
+vi.mock("@/shared/api/resend/templates/course-enrollment", () => ({
+  CourseEnrollmentEmail: vi.fn((props: Record<string, unknown>) => ({
+    type: "CourseEnrollmentEmail",
+    props,
+  })),
+}));
+
+vi.mock("@/shared/api/resend/templates/refund", () => ({
+  RefundEmail: vi.fn((props: Record<string, unknown>) => ({
+    type: "RefundEmail",
     props,
   })),
 }));
@@ -337,7 +373,9 @@ describe("POST /api/payments/webhook", () => {
         },
       },
     });
-    mockInsertValues.mockRejectedValueOnce(new Error("DB connection failed"));
+    mockInsertValues.mockImplementationOnce(() => {
+      throw new Error("DB connection failed");
+    });
 
     const { POST } = await import("@/app/api/payments/webhook/route");
     const request = createWebhookRequest(JSON.stringify({ type: "checkout.created" }));
@@ -469,5 +507,295 @@ describe("POST /api/payments/webhook", () => {
     await new Promise((r) => setTimeout(r, 10));
 
     expect(mockSendEmail).not.toHaveBeenCalled();
+  });
+
+  // ---- Course purchase enrollment tests ----
+
+  it("order.created with course_purchase triggers enrollment insert and email", async () => {
+    // Enrollment insert returns a new record
+    mockInsertReturning.mockResolvedValueOnce([{ id: "enrollment-001" }]);
+
+    // User and course SELECT queries for email
+    mockSelectLimit
+      .mockResolvedValueOnce([{ id: "db-user-456", email: "jade@test.com", name: "Jade" }])
+      .mockResolvedValueOnce([{ title: "React Mastery", price: 49000 }]);
+
+    mockVerifyWebhookEvent.mockReturnValue({
+      type: "order.created",
+      data: {
+        id: "order-course-789",
+        amount: 49000,
+        currency: "KRW",
+        metadata: {
+          userId: "db-user-456",
+          courseId: "course-abc",
+          courseSlug: "react-mastery",
+          type: "course_purchase",
+        },
+      },
+    });
+
+    const { POST } = await import("@/app/api/payments/webhook/route");
+    const request = createWebhookRequest(JSON.stringify({ type: "order.created" }));
+    const response = await POST(request);
+    const body = await response.json();
+
+    expect(response.status).toBe(200);
+    expect(body.received).toBe(true);
+
+    // Payment insert
+    expect(mockInsertValues).toHaveBeenCalledWith(
+      expect.objectContaining({
+        userId: "db-user-456",
+        polarPaymentId: "order-course-789",
+        status: "completed",
+      }),
+    );
+
+    // Enrollment insert via onConflictDoNothing chain
+    expect(mockInsertOnConflictDoNothing).toHaveBeenCalled();
+    expect(mockInsertReturning).toHaveBeenCalled();
+
+    // Give fire-and-forget a tick
+    await new Promise((r) => setTimeout(r, 10));
+
+    expect(mockSendEmail).toHaveBeenCalledWith(
+      expect.objectContaining({
+        to: "jade@test.com",
+        subject: expect.stringContaining("Course Enrolled"),
+      }),
+    );
+  });
+
+  // ---- Refund tests ----
+
+  it("order.refunded for course purchase revokes enrollment and sends RefundEmail", async () => {
+    const courseMetadata = JSON.stringify({
+      metadata: {
+        userId: "db-user-456",
+        courseId: "course-abc",
+        courseSlug: "react-mastery",
+        type: "course_purchase",
+      },
+    });
+
+    // Update returns the refunded payment record
+    mockUpdateReturning.mockResolvedValueOnce([
+      {
+        id: "payment-001",
+        userId: "db-user-456",
+        amount: 49000,
+        currency: "KRW",
+        metadata: courseMetadata,
+      },
+    ]);
+
+    // User and course SELECT queries for refund email
+    mockSelectLimit
+      .mockResolvedValueOnce([{ id: "db-user-456", email: "jade@test.com", name: "Jade" }])
+      .mockResolvedValueOnce([{ title: "React Mastery" }]);
+
+    mockVerifyWebhookEvent.mockReturnValue({
+      type: "order.refunded",
+      data: {
+        id: "order-course-789",
+      },
+    });
+
+    const { POST } = await import("@/app/api/payments/webhook/route");
+    const { db } = await import("@/db/client");
+    const request = createWebhookRequest(JSON.stringify({ type: "order.refunded" }));
+    const response = await POST(request);
+    const body = await response.json();
+
+    expect(response.status).toBe(200);
+    expect(body.received).toBe(true);
+
+    // Payment updated to refunded
+    expect(mockUpdateSet).toHaveBeenCalledWith(expect.objectContaining({ status: "refunded" }));
+
+    // Enrollment deleted
+    expect(db.delete).toHaveBeenCalled();
+    expect(mockDeleteWhere).toHaveBeenCalled();
+
+    // Give fire-and-forget a tick
+    await new Promise((r) => setTimeout(r, 10));
+
+    // Refund email sent
+    expect(mockSendEmail).toHaveBeenCalledWith(
+      expect.objectContaining({
+        to: "jade@test.com",
+        subject: expect.stringContaining("Refund Processed"),
+      }),
+    );
+  });
+
+  it("order.refunded for subscription payment does NOT delete enrollment or send RefundEmail", async () => {
+    const subscriptionMetadata = JSON.stringify({
+      metadata: {
+        userId: "db-user-456",
+        planId: "pro",
+      },
+    });
+
+    // Update returns a subscription payment (no type=course_purchase)
+    mockUpdateReturning.mockResolvedValueOnce([
+      {
+        id: "payment-002",
+        userId: "db-user-456",
+        amount: 19000,
+        currency: "KRW",
+        metadata: subscriptionMetadata,
+      },
+    ]);
+
+    mockVerifyWebhookEvent.mockReturnValue({
+      type: "order.refunded",
+      data: {
+        id: "order-sub-456",
+      },
+    });
+
+    const { POST } = await import("@/app/api/payments/webhook/route");
+    const { db } = await import("@/db/client");
+    const request = createWebhookRequest(JSON.stringify({ type: "order.refunded" }));
+    const response = await POST(request);
+    const body = await response.json();
+
+    expect(response.status).toBe(200);
+    expect(body.received).toBe(true);
+
+    // Payment updated to refunded
+    expect(mockUpdateSet).toHaveBeenCalledWith(expect.objectContaining({ status: "refunded" }));
+
+    // No enrollment deletion
+    expect(db.delete).not.toHaveBeenCalled();
+
+    // No refund email
+    await new Promise((r) => setTimeout(r, 10));
+    expect(mockSendEmail).not.toHaveBeenCalled();
+  });
+
+  it("order.refunded when payment not found gracefully returns 200", async () => {
+    // Update returns empty array (payment not found)
+    mockUpdateReturning.mockResolvedValueOnce([]);
+
+    mockVerifyWebhookEvent.mockReturnValue({
+      type: "order.refunded",
+      data: {
+        id: "order-nonexistent",
+      },
+    });
+
+    const { POST } = await import("@/app/api/payments/webhook/route");
+    const { db } = await import("@/db/client");
+    const request = createWebhookRequest(JSON.stringify({ type: "order.refunded" }));
+    const response = await POST(request);
+    const body = await response.json();
+
+    expect(response.status).toBe(200);
+    expect(body.received).toBe(true);
+
+    // No delete, no email
+    expect(db.delete).not.toHaveBeenCalled();
+    expect(mockSendEmail).not.toHaveBeenCalled();
+  });
+
+  it("order.refunded succeeds even if refund email fails", async () => {
+    const courseMetadata = JSON.stringify({
+      metadata: {
+        userId: "db-user-456",
+        courseId: "course-abc",
+        courseSlug: "react-mastery",
+        type: "course_purchase",
+      },
+    });
+
+    mockUpdateReturning.mockResolvedValueOnce([
+      {
+        id: "payment-001",
+        userId: "db-user-456",
+        amount: 49000,
+        currency: "KRW",
+        metadata: courseMetadata,
+      },
+    ]);
+
+    // User found, course found, but email fails
+    mockSelectLimit
+      .mockResolvedValueOnce([{ id: "db-user-456", email: "jade@test.com", name: "Jade" }])
+      .mockResolvedValueOnce([{ title: "React Mastery" }]);
+    mockSendEmail.mockRejectedValueOnce(new Error("Email service down"));
+
+    const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+
+    mockVerifyWebhookEvent.mockReturnValue({
+      type: "order.refunded",
+      data: {
+        id: "order-course-789",
+      },
+    });
+
+    const { POST } = await import("@/app/api/payments/webhook/route");
+    const request = createWebhookRequest(JSON.stringify({ type: "order.refunded" }));
+    const response = await POST(request);
+    const body = await response.json();
+
+    // Webhook still returns 200 despite email failure
+    expect(response.status).toBe(200);
+    expect(body.received).toBe(true);
+
+    // Enrollment was still deleted
+    expect(mockDeleteWhere).toHaveBeenCalled();
+
+    await new Promise((r) => setTimeout(r, 10));
+    consoleSpy.mockRestore();
+  });
+
+  it("order.refunded with metadata missing courseId logs error and returns 200", async () => {
+    const badMetadata = JSON.stringify({
+      metadata: {
+        userId: "db-user-456",
+        type: "course_purchase",
+        // courseId is missing
+      },
+    });
+
+    mockUpdateReturning.mockResolvedValueOnce([
+      {
+        id: "payment-001",
+        userId: "db-user-456",
+        amount: 49000,
+        currency: "KRW",
+        metadata: badMetadata,
+      },
+    ]);
+
+    const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+
+    mockVerifyWebhookEvent.mockReturnValue({
+      type: "order.refunded",
+      data: {
+        id: "order-bad-meta",
+      },
+    });
+
+    const { POST } = await import("@/app/api/payments/webhook/route");
+    const { db } = await import("@/db/client");
+    const request = createWebhookRequest(JSON.stringify({ type: "order.refunded" }));
+    const response = await POST(request);
+    const body = await response.json();
+
+    expect(response.status).toBe(200);
+    expect(body.received).toBe(true);
+
+    // No enrollment deletion without courseId
+    expect(db.delete).not.toHaveBeenCalled();
+    expect(mockSendEmail).not.toHaveBeenCalled();
+
+    // Error logged about missing courseId
+    expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining("Missing courseId"));
+
+    consoleSpy.mockRestore();
   });
 });
