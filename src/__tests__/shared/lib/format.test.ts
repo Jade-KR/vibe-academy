@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { formatDuration, formatLessonDuration } from "@/shared/lib/format";
+import { formatDuration, formatLessonDuration, formatPrice } from "@/shared/lib/format";
 
 describe("formatDuration", () => {
   it("formats seconds to hours and minutes", () => {
@@ -42,5 +42,35 @@ describe("formatLessonDuration", () => {
 
   it("formats large values", () => {
     expect(formatLessonDuration(600)).toBe("10:00");
+  });
+});
+
+describe("formatPrice", () => {
+  it("formats KRW by default", () => {
+    expect(formatPrice(50000)).toBe("50,000원");
+  });
+
+  it("formats KRW explicitly", () => {
+    expect(formatPrice(50000, "KRW")).toBe("50,000원");
+  });
+
+  it("formats USD", () => {
+    expect(formatPrice(49.99, "USD")).toBe("$49.99");
+  });
+
+  it("formats zero KRW", () => {
+    expect(formatPrice(0)).toBe("0원");
+  });
+
+  it("formats zero USD", () => {
+    expect(formatPrice(0, "USD")).toBe("$0.00");
+  });
+
+  it("formats large KRW", () => {
+    expect(formatPrice(1500000)).toBe("1,500,000원");
+  });
+
+  it("formats negative KRW", () => {
+    expect(formatPrice(-1000)).toBe("-1,000원");
   });
 });
