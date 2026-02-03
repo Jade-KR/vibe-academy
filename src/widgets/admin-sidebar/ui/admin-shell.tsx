@@ -6,6 +6,9 @@ import { Link, usePathname } from "@/i18n/navigation";
 import {
   LayoutDashboard,
   BookOpen,
+  Users,
+  BarChart3,
+  Ticket,
   ArrowLeft,
   Menu,
   PanelLeftClose,
@@ -31,6 +34,9 @@ import { LanguageSwitcher } from "@/widgets/language-switcher";
 const iconMap: Record<string, LucideIcon> = {
   LayoutDashboard,
   BookOpen,
+  Users,
+  BarChart3,
+  Ticket,
 };
 
 function getIcon(name?: string): LucideIcon | undefined {

@@ -10,6 +10,8 @@
     "edit": "수정",
     "back": "뒤로",
     "next": "다음",
+    "previous": "이전",
+    "page": "{current} / {total}",
     "notFound": "페이지를 찾을 수 없습니다",
     "notFoundDescription": "요청하신 페이지가 존재하지 않거나 이동되었습니다.",
     "errorTitle": "문제가 발생했습니다",
@@ -591,7 +593,10 @@
       "joinedAt": "가입일",
       "enrolledCourses": "수강 강의 수",
       "manualEnroll": "수동 등록",
-      "removeEnrollment": "등록 해제"
+      "removeEnrollment": "등록 해제",
+      "role": "역할",
+      "allRoles": "전체",
+      "empty": "등록된 회원이 없습니다"
     },
     "analytics": {
       "title": "매출 통계",
@@ -600,7 +605,9 @@
       "revenue": "매출",
       "byCourse": "강의별 매출",
       "payments": "결제 내역",
-      "refunds": "환불 내역"
+      "refunds": "환불 내역",
+      "summary": "요약",
+      "noData": "데이터가 없습니다"
     },
     "coupons": {
       "title": "쿠폰 관리",
@@ -618,7 +625,14 @@
       "usedCount": "사용 횟수",
       "appliesTo": "적용 대상",
       "allCourses": "전체 강의",
-      "specificCourse": "특정 강의"
+      "specificCourse": "특정 강의",
+      "deleteConfirm": "이 쿠폰을 삭제하시겠습니까?",
+      "created": "쿠폰이 생성되었습니다",
+      "deleted": "쿠폰이 삭제되었습니다",
+      "createFailed": "쿠폰 생성에 실패했습니다",
+      "empty": "등록된 쿠폰이 없습니다",
+      "noExpiry": "만료 없음",
+      "unlimited": "무제한"
     }
   },
   "contact": {
